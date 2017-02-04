@@ -28,7 +28,7 @@ add_subdirectory("${3RD_PARTY_DIR}/glm")
 include_directories(SYSTEM
         "${3RD_PARTY_DIR}/glfw/include"
         "${3RD_PARTY_DIR}/glm"
-        VULKAN_INCLUDE_DIR
+        "${VULKAN_INCLUDE_DIR}"
 )
 
 MESSAGE( STATUS "VULKAN_INCLUDE_DIR: " ${VULKAN_INCLUDE_DIR} )
@@ -46,8 +46,8 @@ if (UNIX)
 endif (UNIX)
 
 add_executable("vulkantest_1"
-        src/test1.cpp
-        src/backward.cpp
+        src/test1/main.cpp
+        3rdparty/backward/backward.cpp
 )
 
 target_link_libraries(vulkantest_1 ${COMMON_LINK_LIBS})
