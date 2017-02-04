@@ -7,27 +7,27 @@ namespace vk
 {
 
 template <typename T>
-class vk_ptr
+class ptr
 {
   public:
-    vk_ptr() : vk_ptr([](T, VkAllocationCallbacks *) {}) {}
+    ptr() : ptr([](T, VkAllocationCallbacks *) {}) {}
 
-    vk_ptr(std::function<void(T, VkAllocationCallbacks *)> deletef)
+    ptr(std::function<void(T, VkAllocationCallbacks *)> deletef)
     {
         this->deleter = [=](T obj) { deletef(obj, nullptr); };
     }
 
-    vk_ptr(const vk_ptr<VkInstance> &instance, std::function<void(VkInstance, T, VkAllocationCallbacks *)> deletef)
+    ptr(const ptr<VkInstance> &instance, std::function<void(VkInstance, T, VkAllocationCallbacks *)> deletef)
     {
         this->deleter = [&instance, deletef](T obj) { deletef(instance, obj, nullptr); };
     }
 
-    vk_ptr(const vk_ptr<VkDevice> &device, std::function<void(VkDevice, T, VkAllocationCallbacks *)> deletef)
+    ptr(const ptr<VkDevice> &device, std::function<void(VkDevice, T, VkAllocationCallbacks *)> deletef)
     {
         this->deleter = [&device, deletef](T obj) { deletef(device, obj, nullptr); };
     }
 
-    ~vk_ptr()
+    ~ptr()
     {
         cleanup();
     }

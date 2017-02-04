@@ -80,32 +80,32 @@ class HelloTriangleApplication
   private:
     GLFWwindow *window;
 
-    vk_ptr<VkInstance> instance{vkDestroyInstance};
-    vk_ptr<VkDebugReportCallbackEXT> callback{instance, DestroyDebugReportCallbackEXT};
-    vk_ptr<VkSurfaceKHR> surface{instance, vkDestroySurfaceKHR};
+    vk::ptr<VkInstance> instance{vkDestroyInstance};
+    vk::ptr<VkDebugReportCallbackEXT> callback{instance, DestroyDebugReportCallbackEXT};
+    vk::ptr<VkSurfaceKHR> surface{instance, vkDestroySurfaceKHR};
 
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    vk_ptr<VkDevice> device{vkDestroyDevice};
+    vk::ptr<VkDevice> device{vkDestroyDevice};
 
     VkQueue graphicsQueue;
     VkQueue presentQueue;
 
-    vk_ptr<VkSwapchainKHR> swapChain{device, vkDestroySwapchainKHR};
+    vk::ptr<VkSwapchainKHR> swapChain{device, vkDestroySwapchainKHR};
     std::vector<VkImage> swapChainImages;
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
-    std::vector<vk_ptr<VkImageView>> swapChainImageViews;
-    std::vector<vk_ptr<VkFramebuffer>> swapChainFramebuffers;
+    std::vector<vk::ptr<VkImageView>> swapChainImageViews;
+    std::vector<vk::ptr<VkFramebuffer>> swapChainFramebuffers;
 
-    vk_ptr<VkRenderPass> renderPass{device, vkDestroyRenderPass};
-    vk_ptr<VkPipelineLayout> pipelineLayout{device, vkDestroyPipelineLayout};
-    vk_ptr<VkPipeline> graphicsPipeline{device, vkDestroyPipeline};
+    vk::ptr<VkRenderPass> renderPass{device, vkDestroyRenderPass};
+    vk::ptr<VkPipelineLayout> pipelineLayout{device, vkDestroyPipelineLayout};
+    vk::ptr<VkPipeline> graphicsPipeline{device, vkDestroyPipeline};
 
-    vk_ptr<VkCommandPool> commandPool{device, vkDestroyCommandPool};
+    vk::ptr<VkCommandPool> commandPool{device, vkDestroyCommandPool};
     std::vector<VkCommandBuffer> commandBuffers;
 
-    vk_ptr<VkSemaphore> imageAvailableSemaphore{device, vkDestroySemaphore};
-    vk_ptr<VkSemaphore> renderFinishedSemaphore{device, vkDestroySemaphore};
+    vk::ptr<VkSemaphore> imageAvailableSemaphore{device, vkDestroySemaphore};
+    vk::ptr<VkSemaphore> renderFinishedSemaphore{device, vkDestroySemaphore};
 
     void initWindow()
     {
@@ -349,7 +349,7 @@ class HelloTriangleApplication
 
     void createImageViews()
     {
-        swapChainImageViews.resize(swapChainImages.size(), vk_ptr<VkImageView>{device, vkDestroyImageView});
+        swapChainImageViews.resize(swapChainImages.size(), vk::ptr<VkImageView>{device, vkDestroyImageView});
 
         for (uint32_t i = 0; i < swapChainImages.size(); i++)
         {
@@ -424,8 +424,8 @@ class HelloTriangleApplication
         auto vertShaderCode = readFile("shader1.vert.spv");
         auto fragShaderCode = readFile("shader1.frag.spv");
 
-        vk_ptr<VkShaderModule> vertShaderModule{device, vkDestroyShaderModule};
-        vk_ptr<VkShaderModule> fragShaderModule{device, vkDestroyShaderModule};
+        vk::ptr<VkShaderModule> vertShaderModule{device, vkDestroyShaderModule};
+        vk::ptr<VkShaderModule> fragShaderModule{device, vkDestroyShaderModule};
         createShaderModule(vertShaderCode, vertShaderModule);
         createShaderModule(fragShaderCode, fragShaderModule);
 
@@ -535,7 +535,7 @@ class HelloTriangleApplication
 
     void createFramebuffers()
     {
-        swapChainFramebuffers.resize(swapChainImageViews.size(), vk_ptr<VkFramebuffer>{device, vkDestroyFramebuffer});
+        swapChainFramebuffers.resize(swapChainImageViews.size(), vk::ptr<VkFramebuffer>{device, vkDestroyFramebuffer});
 
         for (size_t i = 0; i < swapChainImageViews.size(); i++)
         {
@@ -675,7 +675,7 @@ class HelloTriangleApplication
         vkQueuePresentKHR(presentQueue, &presentInfo);
     }
 
-    void createShaderModule(const std::vector<char> &code, vk_ptr<VkShaderModule> &shaderModule)
+    void createShaderModule(const std::vector<char> &code, vk::ptr<VkShaderModule> &shaderModule)
     {
         VkShaderModuleCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
