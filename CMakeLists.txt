@@ -45,9 +45,18 @@ if (UNIX)
     set(COMMON_LINK_LIBS ${COMMON_LINK_LIBS} bfd)
 endif (UNIX)
 
+# TEST 1
 add_executable("vulkantest_1"
         src/test1/main.cpp
+        src/common/io.cpp
         3rdparty/backward/backward.cpp
 )
-
 target_link_libraries(vulkantest_1 ${COMMON_LINK_LIBS})
+
+# TEST 2
+add_executable("vulkantest_2"
+        src/test2/main.cpp
+        src/common/io.cpp
+        3rdparty/backward/backward.cpp
+)
+target_link_libraries(vulkantest_2 ${COMMON_LINK_LIBS})

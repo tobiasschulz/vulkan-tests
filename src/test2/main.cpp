@@ -49,77 +49,6 @@ void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT
     }
 }
 
-template <typename T>
-class VDeleter
-{
-  public:
-    VDeleter() : VDeleter([](T, VkAllocationCallbacks *) {}) {}
-
-    VDeleter(std::function<void(T, VkAllocationCallbacks *)> deletef)
-    {
-        this->deleter = [=](T obj) { deletef(obj, nullptr); };
-    }
-
-    VDeleter(const VDeleter<VkInstance> &instance, std::function<void(VkInstance, T, VkAllocationCallbacks *)> deletef)
-    {
-        this->deleter = [&instance, deletef](T obj) { deletef(instance, obj, nullptr); };
-    }
-
-    VDeleter(const VDeleter<VkDevice> &device, std::function<void(VkDevice, T, VkAllocationCallbacks *)> deletef)
-    {
-        this->deleter = [&device, deletef](T obj) { deletef(device, obj, nullptr); };
-    }
-
-    ~VDeleter()
-    {
-        cleanup();
-    }
-
-    const T *operator&() const
-    {
-        return &object;
-    }
-
-    T *replace()
-    {
-        cleanup();
-        return &object;
-    }
-
-    operator T() const
-    {
-        return object;
-    }
-
-    void operator=(T rhs)
-    {
-        if (rhs != object)
-        {
-            cleanup();
-            object = rhs;
-        }
-    }
-
-    template <typename V>
-    bool operator==(V rhs)
-    {
-        return object == T(rhs);
-    }
-
-  private:
-    T object{VK_NULL_HANDLE};
-    std::function<void(T)> deleter;
-
-    void cleanup()
-    {
-        if (object != VK_NULL_HANDLE)
-        {
-            deleter(object);
-        }
-        object = VK_NULL_HANDLE;
-    }
-};
-
 struct QueueFamilyIndices
 {
     int graphicsFamily = -1;
@@ -151,32 +80,32 @@ class HelloTriangleApplication
   private:
     GLFWwindow *window;
 
-    VDeleter<VkInstance> instance{vkDestroyInstance};
-    VDeleter<VkDebugReportCallbackEXT> callback{instance, DestroyDebugReportCallbackEXT};
-    VDeleter<VkSurfaceKHR> surface{instance, vkDestroySurfaceKHR};
+    vk_ptr<VkInstance> instance{vkDestroyInstance};
+    vk_ptr<VkDebugReportCallbackEXT> callback{instance, DestroyDebugReportCallbackEXT};
+    vk_ptr<VkSurfaceKHR> surface{instance, vkDestroySurfaceKHR};
 
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VDeleter<VkDevice> device{vkDestroyDevice};
+    vk_ptr<VkDevice> device{vkDestroyDevice};
 
     VkQueue graphicsQueue;
     VkQueue presentQueue;
 
-    VDeleter<VkSwapchainKHR> swapChain{device, vkDestroySwapchainKHR};
+    vk_ptr<VkSwapchainKHR> swapChain{device, vkDestroySwapchainKHR};
     std::vector<VkImage> swapChainImages;
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
-    std::vector<VDeleter<VkImageView>> swapChainImageViews;
-    std::vector<VDeleter<VkFramebuffer>> swapChainFramebuffers;
+    std::vector<vk_ptr<VkImageView>> swapChainImageViews;
+    std::vector<vk_ptr<VkFramebuffer>> swapChainFramebuffers;
 
-    VDeleter<VkRenderPass> renderPass{device, vkDestroyRenderPass};
-    VDeleter<VkPipelineLayout> pipelineLayout{device, vkDestroyPipelineLayout};
-    VDeleter<VkPipeline> graphicsPipeline{device, vkDestroyPipeline};
+    vk_ptr<VkRenderPass> renderPass{device, vkDestroyRenderPass};
+    vk_ptr<VkPipelineLayout> pipelineLayout{device, vkDestroyPipelineLayout};
+    vk_ptr<VkPipeline> graphicsPipeline{device, vkDestroyPipeline};
 
-    VDeleter<VkCommandPool> commandPool{device, vkDestroyCommandPool};
+    vk_ptr<VkCommandPool> commandPool{device, vkDestroyCommandPool};
     std::vector<VkCommandBuffer> commandBuffers;
 
-    VDeleter<VkSemaphore> imageAvailableSemaphore{device, vkDestroySemaphore};
-    VDeleter<VkSemaphore> renderFinishedSemaphore{device, vkDestroySemaphore};
+    vk_ptr<VkSemaphore> imageAvailableSemaphore{device, vkDestroySemaphore};
+    vk_ptr<VkSemaphore> renderFinishedSemaphore{device, vkDestroySemaphore};
 
     void initWindow()
     {
@@ -420,7 +349,7 @@ class HelloTriangleApplication
 
     void createImageViews()
     {
-        swapChainImageViews.resize(swapChainImages.size(), VDeleter<VkImageView>{device, vkDestroyImageView});
+        swapChainImageViews.resize(swapChainImages.size(), vk_ptr<VkImageView>{device, vkDestroyImageView});
 
         for (uint32_t i = 0; i < swapChainImages.size(); i++)
         {
@@ -495,8 +424,8 @@ class HelloTriangleApplication
         auto vertShaderCode = readFile("shader1.vert.spv");
         auto fragShaderCode = readFile("shader1.frag.spv");
 
-        VDeleter<VkShaderModule> vertShaderModule{device, vkDestroyShaderModule};
-        VDeleter<VkShaderModule> fragShaderModule{device, vkDestroyShaderModule};
+        vk_ptr<VkShaderModule> vertShaderModule{device, vkDestroyShaderModule};
+        vk_ptr<VkShaderModule> fragShaderModule{device, vkDestroyShaderModule};
         createShaderModule(vertShaderCode, vertShaderModule);
         createShaderModule(fragShaderCode, fragShaderModule);
 
@@ -606,7 +535,7 @@ class HelloTriangleApplication
 
     void createFramebuffers()
     {
-        swapChainFramebuffers.resize(swapChainImageViews.size(), VDeleter<VkFramebuffer>{device, vkDestroyFramebuffer});
+        swapChainFramebuffers.resize(swapChainImageViews.size(), vk_ptr<VkFramebuffer>{device, vkDestroyFramebuffer});
 
         for (size_t i = 0; i < swapChainImageViews.size(); i++)
         {
@@ -746,7 +675,7 @@ class HelloTriangleApplication
         vkQueuePresentKHR(presentQueue, &presentInfo);
     }
 
-    void createShaderModule(const std::vector<char> &code, VDeleter<VkShaderModule> &shaderModule)
+    void createShaderModule(const std::vector<char> &code, vk_ptr<VkShaderModule> &shaderModule)
     {
         VkShaderModuleCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
