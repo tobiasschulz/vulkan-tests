@@ -1,10 +1,13 @@
 #!/bin/bash
 
 build() {
+    bash $HOME/src/VulkanSDK/*/setup-env.sh
+
     rm -rf build && \
     mkdir build && \
-    cd build && (
-        cmake ..
+    (
+        cd build && \
+        cmake .. && \
         make
     )
 }
@@ -20,7 +23,9 @@ case $1 in
     build
     ;;
 "run")
-    shift
-    run "$@"
+    build && (
+        shift
+        run "$@"
+    )
     ;;
 esac

@@ -16,6 +16,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(3RD_PARTY_DIR ${CMAKE_CURRENT_LIST_DIR}/3rdparty)
 
 find_package(OpenGL)
+find_package(Vulkan)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -27,18 +28,26 @@ add_subdirectory("${3RD_PARTY_DIR}/glm")
 include_directories(SYSTEM
         "${3RD_PARTY_DIR}/glfw/include"
         "${3RD_PARTY_DIR}/glm"
+        VULKAN_INCLUDE_DIR
 )
 
-set(COMMON_LINK_LIBS ${CMAKE_DL_LIBS} glfw ${OPENGL_LIBRARIES})
+MESSAGE( STATUS "VULKAN_INCLUDE_DIR: " ${VULKAN_INCLUDE_DIR} )
+
+
+add_definitions(
+        -DGLEW_STATIC
+)
+
+set(COMMON_LINK_LIBS ${CMAKE_DL_LIBS} ${OPENGL_LIBRARIES} glfw ${VULKAN_LIBRARY})
 
 if (UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    set(COMMON_LINK_LIBS ${COMMON_LINK_LIBS} bfd)
 endif (UNIX)
 
-add_executable(vulkantest_1,
-        test1.cpp
-        common.cpp
-        backward.cpp
+add_executable("vulkantest_1"
+        src/test1.cpp
+        src/backward.cpp
 )
 
 target_link_libraries(vulkantest_1 ${COMMON_LINK_LIBS})
