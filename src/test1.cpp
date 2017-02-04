@@ -433,8 +433,8 @@ private:
     }
 
     void createGraphicsPipeline() {
-        auto vertShaderCode = readFile("shaders/vert.spv");
-        auto fragShaderCode = readFile("shaders/frag.spv");
+        auto vertShaderCode = readFile("shader1.vert.spv");
+        auto fragShaderCode = readFile("shader1.frag.spv");
 
         VDeleter<VkShaderModule> vertShaderModule{device, vkDestroyShaderModule};
         VDeleter<VkShaderModule> fragShaderModule{device, vkDestroyShaderModule};
