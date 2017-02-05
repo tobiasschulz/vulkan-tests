@@ -62,7 +62,9 @@ add_executable("vulkantest_1"
         src/helper/QueueFamilies.h
         src/helper/Shader.cpp
         src/helper/Shader.h
-)
+        src/helper/vulkan.cpp
+        src/helper/vulkan.h
+        )
 target_link_libraries(vulkantest_1 ${COMMON_LINK_LIBS})
 
 # TEST 2
@@ -81,5 +83,7 @@ add_executable("vulkantest_2"
         src/helper/QueueFamilies.h
         src/helper/Shader.cpp
         src/helper/Shader.h
+        src/helper/vulkan.cpp
+        src/helper/vulkan.h
 )
 target_link_libraries(vulkantest_2 ${COMMON_LINK_LIBS})

@@ -21,7 +21,7 @@ namespace helper
             createInfo.imageSharingMode = vk::SharingMode::eConcurrent;
             createInfo.queueFamilyIndexCount = 2;
 
-            uint32_t queueFamilyIndices[] = {(uint32_t) graphicsFamily, (uint32_t) presentFamily};
+            uint32_t queueFamilyIndices[] = { (uint32_t) graphicsFamily, (uint32_t) presentFamily };
             createInfo.pQueueFamilyIndices = queueFamilyIndices;
         } else {
             createInfo.imageSharingMode = vk::SharingMode::eExclusive;
@@ -40,9 +40,7 @@ namespace helper
                 indices.graphicsFamily = i;
             }
 
-            vk::Bool32
-                    presentSupport = (vk::Bool32)
-                    false;
+            vk::Bool32 presentSupport = (vk::Bool32) false;
 
             physicalDevice.getSurfaceSupportKHR (i, surface, &presentSupport);
 

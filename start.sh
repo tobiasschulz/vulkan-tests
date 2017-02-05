@@ -15,7 +15,7 @@ build() {
             done
         ) && \
         cmake .. && \
-        make
+        make -j4
     )
 }
 

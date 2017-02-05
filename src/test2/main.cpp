@@ -27,27 +27,6 @@ bool enableValidationLayers = false;
 bool enableValidationLayers = true;
 #endif
 
-VkResult CreateDebugReportCallbackEXT (VkInstance instance, const VkDebugReportCallbackCreateInfoEXT *pCreateInfo,
-                                       const VkAllocationCallbacks *pAllocator, VkDebugReportCallbackEXT *pCallback)
-{
-    auto func = (PFN_vkCreateDebugReportCallbackEXT) vkGetInstanceProcAddr (instance, "vkCreateDebugReportCallbackEXT");
-    if (func != nullptr) {
-        return func (instance, pCreateInfo, pAllocator, pCallback);
-    } else {
-        return VK_ERROR_EXTENSION_NOT_PRESENT;
-    }
-}
-
-void DestroyDebugReportCallbackEXT (VkInstance instance, VkDebugReportCallbackEXT callback,
-                                    const VkAllocationCallbacks *pAllocator)
-{
-    auto func = (PFN_vkDestroyDebugReportCallbackEXT) vkGetInstanceProcAddr (instance,
-                                                                             "vkDestroyDebugReportCallbackEXT");
-    if (func != nullptr) {
-        func (instance, callback, pAllocator);
-    }
-}
-
 class HelloTriangleApplication
 {
 public:
@@ -167,12 +146,11 @@ private:
 
     void createSurface ()
     {
-        vk::SurfaceKHRDeleter deleter (&*instance);
-        VkSurfaceKHR *result;
-        if (glfwCreateWindowSurface (((VkInstance) *instance), window, nullptr, result) != VK_SUCCESS) {
+        VkSurfaceKHR result;
+        if (glfwCreateWindowSurface (((VkInstance) instance.get ()), window, nullptr, &result) != VK_SUCCESS) {
             throw std::runtime_error ("failed to create window surface!");
         }
-        surface = vk::UniqueSurfaceKHR (*result, deleter);
+        surface = vk::UniqueSurfaceKHR (result);
     }
 
     void pickPhysicalDevice ()
@@ -324,7 +302,7 @@ private:
     void createGraphicsPipeline ()
     {
         helper::Shader vertShader = helper::Shader::loadShader (*device, vk::ShaderStageFlagBits::eVertex, "shader1.vert.spv");
-        helper::Shader fragShader = helper::Shader::loadShader (*device, vk::ShaderStageFlagBits::eFragment, std::string ("shader1.frag.spv"));
+        helper::Shader fragShader = helper::Shader::loadShader (*device, vk::ShaderStageFlagBits::eFragment, "shader1.frag.spv");
 
         vk::PipelineShaderStageCreateInfo shaderStages[] = {
                 vertShader.getPipelineShaderStageCreateInfo ("main"),
@@ -404,9 +382,17 @@ private:
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-        vk::PipelineCache dummyCache;
+        vk::PipelineCache dummyCache; // = device->createPipelineCache (vk::PipelineCacheCreateInfo (vk::PipelineCacheCreateFlags ()));
 
         graphicsPipeline = device->createGraphicsPipelineUnique (dummyCache, pipelineInfo);
+
+        /*VkGraphicsPipelineCreateInfo i = (VkGraphicsPipelineCreateInfo) pipelineInfo;
+        VkPipeline p;
+        if (vkCreateGraphicsPipelines ((VkDevice) device.get (), VK_NULL_HANDLE, 1, &i, nullptr, &p) !=
+            VK_SUCCESS) {
+            throw std::runtime_error ("failed to create graphics pipeline!");
+        }
+        graphicsPipeline = vk::UniquePipeline (vk::Pipeline (p));*/
     }
 
     void createFramebuffers ()
@@ -424,7 +410,7 @@ private:
             framebufferInfo.height = swapChainExtent.height;
             framebufferInfo.layers = 1;
 
-            swapChainFramebuffers[i] = device->createFramebufferUnique (framebufferInfo);
+            swapChainFramebuffers.push_back (device->createFramebufferUnique (framebufferInfo));
         }
     }
 

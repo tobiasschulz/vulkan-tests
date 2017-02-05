@@ -7,13 +7,13 @@
 
 namespace helper
 {
-    Shader &&Shader::loadShader (const vk::Device &device, vk::ShaderStageFlagBits stage, const std::string &&filename)
+    Shader Shader::loadShader (const vk::Device &device, vk::ShaderStageFlagBits stage, const std::string &&filename)
     {
         std::vector<char> code = helper::io::readFile (filename);
         return loadShader (device, stage, code);
     }
 
-    Shader &&Shader::loadShader (const vk::Device &device, vk::ShaderStageFlagBits stage, std::vector<char> code)
+    Shader Shader::loadShader (const vk::Device &device, vk::ShaderStageFlagBits stage, std::vector<char> code)
     {
         return Shader (device, stage, code);
     }
@@ -21,7 +21,9 @@ namespace helper
     Shader::Shader (const vk::Device &device, vk::ShaderStageFlagBits stage, std::vector<char> code)
     {
         this->stage = stage;
-        this->shaderModule = device.createShaderModuleUnique (vk::ShaderModuleCreateInfo ({}, code.size (), (uint32_t *) code.data ()));
+        vk::ShaderModuleCreateInfo createInfo ({}, code.size (), (uint32_t *) code.data ());
+
+        this->shaderModule = device.createShaderModuleUnique (createInfo);
     }
 
     vk::ShaderModule Shader::getShaderModule ()
