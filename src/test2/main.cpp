@@ -80,9 +80,9 @@ class HelloTriangleApplication
   private:
     GLFWwindow *window;
 
-    vk::ptr<VkInstance> instance{vkDestroyInstance};
-    vk::ptr<VkDebugReportCallbackEXT> callback{instance, DestroyDebugReportCallbackEXT};
-    vk::ptr<VkSurfaceKHR> surface{instance, vkDestroySurfaceKHR};
+    vk::UniqueInstance instance;
+    vk::UniqueDebugReportCallbackEXT callback;
+    vk::UniqueSurfaceKHR surface;
 
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     vk::ptr<VkDevice> device{vkDestroyDevice};
@@ -154,21 +154,12 @@ class HelloTriangleApplication
             throw std::runtime_error("validation layers requested, but not available!");
         }
 
-        VkApplicationInfo appInfo = {};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "Hello Triangle";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName = "No Engine";
-        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
-
-        VkInstanceCreateInfo createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        createInfo.pApplicationInfo = &appInfo;
+        vk::ApplicationInfo appInfo("Hello Triangle 2", VK_MAKE_VERSION(1, 0, 0), "No Engine", VK_MAKE_VERSION(1, 0, 0), VK_API_VERSION_1_0);
+        vk::InstanceCreateInfo createInfo({}, &appInfo);
 
         auto extensions = getRequiredExtensions();
-        createInfo.enabledExtensionCount = extensions.size();
-        createInfo.ppEnabledExtensionNames = extensions.data();
+        createInfo.setEnabledExtensionCount(extensions.size());
+        createInfo.setPpEnabledExtensionNames(extensions.data());
 
         if (enableValidationLayers)
         {
@@ -180,10 +171,7 @@ class HelloTriangleApplication
             createInfo.enabledLayerCount = 0;
         }
 
-        if (vkCreateInstance(&createInfo, nullptr, instance.replace()) != VK_SUCCESS)
-        {
-            throw std::runtime_error("failed to create instance!");
-        }
+        instance = vk::createInstanceUnique(createInfo);
     }
 
     void setupDebugCallback()
@@ -191,27 +179,25 @@ class HelloTriangleApplication
         if (!enableValidationLayers)
             return;
 
-        VkDebugReportCallbackCreateInfoEXT createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
-        createInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
-        createInfo.pfnCallback = debugCallback;
-
-        if (CreateDebugReportCallbackEXT(instance, &createInfo, nullptr, callback.replace()) != VK_SUCCESS)
-        {
-            throw std::runtime_error("failed to set up debug callback!");
-        }
+        vk::DebugReportCallbackCreateInfoEXT createInfo(vk::DebugReportFlagBitsEXT::eDebug, debugCallback);
+        callback = instance->createDebugReportCallbackEXTUnique(createInfo);
     }
 
     void createSurface()
     {
-        if (glfwCreateWindowSurface(instance, window, nullptr, surface.replace()) != VK_SUCCESS)
+        vk::SurfaceKHRDeleter deleter(&*instance);
+        VkSurfaceKHR *result;
+        if (glfwCreateWindowSurface(((VkInstance)*instance), window, nullptr, result) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create window surface!");
         }
+        surface = vk::UniqueSurfaceKHR(*result, deleter);
     }
 
     void pickPhysicalDevice()
     {
+        auto devies = instance->enumeratePhysicalDevices();
+
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 

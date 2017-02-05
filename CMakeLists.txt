@@ -26,6 +26,7 @@ add_subdirectory("${3RD_PARTY_DIR}/glfw")
 add_subdirectory("${3RD_PARTY_DIR}/glm")
 
 include_directories(SYSTEM
+        "${3RD_PARTY_DIR}/vulkan-hpp"
         "${3RD_PARTY_DIR}/glfw/include"
         "${3RD_PARTY_DIR}/glm"
         "${VULKAN_INCLUDE_DIR}"
