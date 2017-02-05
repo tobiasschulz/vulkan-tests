@@ -6,43 +6,54 @@
 #define VULKANTEST_OLD_H
 
 
-namespace vk {
+namespace vk
+{
 
     template<typename T>
-    class ptr {
+    class ptr
+    {
     public:
-        ptr () : ptr ([] (T, VkAllocationCallbacks *) {}) {}
+        ptr () : ptr ([] (T, VkAllocationCallbacks *) {})
+        {}
 
-        ptr (std::function<void (T, VkAllocationCallbacks *)> deletef) {
+        ptr (std::function<void (T, VkAllocationCallbacks *)> deletef)
+        {
             this->deleter = [=] (T obj) { deletef (obj, nullptr); };
         }
 
-        ptr (const ptr<VkInstance> &instance, std::function<void (VkInstance, T, VkAllocationCallbacks *)> deletef) {
+        ptr (const ptr<VkInstance> &instance, std::function<void (VkInstance, T, VkAllocationCallbacks * )> deletef)
+        {
             this->deleter = [&instance, deletef] (T obj) { deletef (instance, obj, nullptr); };
         }
 
-        ptr (const ptr<VkDevice> &device, std::function<void (VkDevice, T, VkAllocationCallbacks *)> deletef) {
+        ptr (const ptr<VkDevice> &device, std::function<void (VkDevice, T, VkAllocationCallbacks * )> deletef)
+        {
             this->deleter = [&device, deletef] (T obj) { deletef (device, obj, nullptr); };
         }
 
-        ~ptr () {
+        ~ptr ()
+        {
             cleanup ();
         }
 
-        const T *operator& () const {
+        const T *operator& () const
+        {
             return &object;
         }
 
-        T *replace () {
+        T *replace ()
+        {
             cleanup ();
             return &object;
         }
 
-        operator T () const {
+        operator T () const
+        {
             return object;
         }
 
-        void operator= (T rhs) {
+        void operator= (T rhs)
+        {
             if (rhs != object) {
                 cleanup ();
                 object = rhs;
@@ -50,7 +61,8 @@ namespace vk {
         }
 
         template<typename V>
-        bool operator== (V rhs) {
+        bool operator== (V rhs)
+        {
             return object == T (rhs);
         }
 
@@ -58,7 +70,8 @@ namespace vk {
         T object{VK_NULL_HANDLE};
         std::function<void (T)> deleter;
 
-        void cleanup () {
+        void cleanup ()
+        {
             if (object != VK_NULL_HANDLE) {
                 deleter (object);
             }

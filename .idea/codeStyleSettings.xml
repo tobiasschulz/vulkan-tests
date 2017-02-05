@@ -4,6 +4,10 @@
     <option name="PER_PROJECT_SETTINGS">
       <value>
         <option name="RIGHT_MARGIN" value="200" />
+        <Objective-C>
+          <option name="NAMESPACE_BRACE_PLACEMENT" value="2" />
+          <option name="FUNCTION_BRACE_PLACEMENT" value="2" />
+        </Objective-C>
         <Objective-C-extensions>
           <file>
             <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Import" />
@@ -30,6 +34,7 @@
           </extensions>
         </Objective-C-extensions>
         <codeStyleSettings language="ObjectiveC">
+          <option name="CLASS_BRACE_STYLE" value="2" />
           <option name="SPACE_BEFORE_METHOD_CALL_PARENTHESES" value="true" />
           <option name="SPACE_BEFORE_METHOD_PARENTHESES" value="true" />
         </codeStyleSettings>

@@ -7,13 +7,19 @@
 
 #include "../helper/vulkan.h"
 
-struct SwapChainSupportDetails {
+class SwapChainSupportDetails
+{
+public:
     vk::SurfaceCapabilitiesKHR capabilities;
     std::vector<vk::SurfaceFormatKHR> formats;
     std::vector<vk::PresentModeKHR> presentModes;
+
+    vk::SurfaceFormatKHR chooseSwapSurfaceFormat ();
+
 };
 
-class VulkanHelper {
+class VulkanHelper
+{
 
 public:
     static SwapChainSupportDetails querySwapChainSupport (vk::SurfaceKHR surface, vk::PhysicalDevice device);

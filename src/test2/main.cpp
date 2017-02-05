@@ -2,6 +2,7 @@
 
 #include "../helper/vulkan.h"
 #include "../common/io.h"
+#include "../helper/VulkanHelper.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -28,7 +29,8 @@ bool enableValidationLayers = true;
 #endif
 
 VkResult CreateDebugReportCallbackEXT (VkInstance instance, const VkDebugReportCallbackCreateInfoEXT *pCreateInfo,
-                                       const VkAllocationCallbacks *pAllocator, VkDebugReportCallbackEXT *pCallback) {
+                                       const VkAllocationCallbacks *pAllocator, VkDebugReportCallbackEXT *pCallback)
+{
     auto func = (PFN_vkCreateDebugReportCallbackEXT) vkGetInstanceProcAddr (instance, "vkCreateDebugReportCallbackEXT");
     if (func != nullptr) {
         return func (instance, pCreateInfo, pAllocator, pCallback);
@@ -38,7 +40,8 @@ VkResult CreateDebugReportCallbackEXT (VkInstance instance, const VkDebugReportC
 }
 
 void DestroyDebugReportCallbackEXT (VkInstance instance, VkDebugReportCallbackEXT callback,
-                                    const VkAllocationCallbacks *pAllocator) {
+                                    const VkAllocationCallbacks *pAllocator)
+{
     auto func = (PFN_vkDestroyDebugReportCallbackEXT) vkGetInstanceProcAddr (instance,
                                                                              "vkDestroyDebugReportCallbackEXT");
     if (func != nullptr) {
@@ -46,18 +49,22 @@ void DestroyDebugReportCallbackEXT (VkInstance instance, VkDebugReportCallbackEX
     }
 }
 
-struct QueueFamilyIndices {
+struct QueueFamilyIndices
+{
     int graphicsFamily = -1;
     int presentFamily = -1;
 
-    bool isComplete () {
+    bool isComplete ()
+    {
         return graphicsFamily >= 0 && presentFamily >= 0;
     }
 };
 
-class HelloTriangleApplication {
+class HelloTriangleApplication
+{
 public:
-    void run () {
+    void run ()
+    {
         initWindow ();
         initVulkan ();
         mainLoop ();
@@ -93,7 +100,8 @@ private:
     vk::ptr<VkSemaphore> imageAvailableSemaphore{device, vkDestroySemaphore};
     vk::ptr<VkSemaphore> renderFinishedSemaphore{device, vkDestroySemaphore};
 
-    void initWindow () {
+    void initWindow ()
+    {
         glfwInit ();
 
         glfwWindowHint (GLFW_CLIENT_API, GLFW_NO_API);
@@ -102,7 +110,8 @@ private:
         window = glfwCreateWindow (WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
     }
 
-    void initVulkan () {
+    void initVulkan ()
+    {
         createInstance ();
         setupDebugCallback ();
         createSurface ();
@@ -118,7 +127,8 @@ private:
         createSemaphores ();
     }
 
-    void mainLoop () {
+    void mainLoop ()
+    {
         while (!glfwWindowShouldClose (window)) {
             glfwPollEvents ();
             drawFrame ();
@@ -129,7 +139,8 @@ private:
         glfwDestroyWindow (window);
     }
 
-    void createInstance () {
+    void createInstance ()
+    {
         if (enableValidationLayers && !checkValidationLayerSupport ()) {
             throw std::runtime_error ("validation layers requested, but not available!");
         }
@@ -153,7 +164,8 @@ private:
         instance = vk::createInstanceUnique (createInfo);
     }
 
-    void setupDebugCallback () {
+    void setupDebugCallback ()
+    {
         if (!enableValidationLayers)
             return;
 
@@ -161,7 +173,8 @@ private:
         callback = instance->createDebugReportCallbackEXTUnique (createInfo);
     }
 
-    void createSurface () {
+    void createSurface ()
+    {
         vk::SurfaceKHRDeleter deleter (&*instance);
         VkSurfaceKHR *result;
         if (glfwCreateWindowSurface (((VkInstance) *instance), window, nullptr, result) != VK_SUCCESS) {
@@ -170,7 +183,8 @@ private:
         surface = vk::UniqueSurfaceKHR (*result, deleter);
     }
 
-    void pickPhysicalDevice () {
+    void pickPhysicalDevice ()
+    {
         auto devices = instance->enumeratePhysicalDevices ();
         for (const auto &d : devices) {
             if (isDeviceSuitable (d)) {
@@ -184,7 +198,8 @@ private:
         }
     }
 
-    void createLogicalDevice () {
+    void createLogicalDevice ()
+    {
         QueueFamilyIndices indices = findQueueFamilies (physicalDevice);
 
         std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
@@ -212,12 +227,13 @@ private:
 
         device = physicalDevice.createDeviceUnique (createInfo);
 
-        device->getQueue ((uint32_t)indices.graphicsFamily, 0, &graphicsQueue);
-        device->getQueue ((uint32_t)indices.presentFamily, 0, &presentQueue);
+        device->getQueue ((uint32_t) indices.graphicsFamily, 0, &graphicsQueue);
+        device->getQueue ((uint32_t) indices.presentFamily, 0, &presentQueue);
     }
 
-    void createSwapChain () {
-        SwapChainSupportDetails swapChainSupport = querySwapChainSupport (physicalDevice);
+    void createSwapChain ()
+    {
+        SwapChainSupportDetails swapChainSupport = VulkanHelper::querySwapChainSupport (surface, physicalDevice);
 
         VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat (swapChainSupport.formats);
         VkPresentModeKHR presentMode = chooseSwapPresentMode (swapChainSupport.presentModes);
@@ -270,7 +286,8 @@ private:
         swapChainExtent = extent;
     }
 
-    void createImageViews () {
+    void createImageViews ()
+    {
         swapChainImageViews.resize (swapChainImages.size (), vk::ptr<VkImageView>{device, vkDestroyImageView});
 
         for (uint32_t i = 0; i < swapChainImages.size (); i++) {
@@ -295,7 +312,8 @@ private:
         }
     }
 
-    void createRenderPass () {
+    void createRenderPass ()
+    {
         VkAttachmentDescription colorAttachment = {};
         colorAttachment.format = swapChainImageFormat;
         colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -337,7 +355,8 @@ private:
         }
     }
 
-    void createGraphicsPipeline () {
+    void createGraphicsPipeline ()
+    {
         auto vertShaderCode = readFile ("shader1.vert.spv");
         auto fragShaderCode = readFile ("shader1.frag.spv");
 
@@ -452,7 +471,8 @@ private:
         }
     }
 
-    void createFramebuffers () {
+    void createFramebuffers ()
+    {
         swapChainFramebuffers.resize (swapChainImageViews.size (),
                                       vk::ptr<VkFramebuffer>{device, vkDestroyFramebuffer});
 
@@ -476,7 +496,8 @@ private:
         }
     }
 
-    void createCommandPool () {
+    void createCommandPool ()
+    {
         QueueFamilyIndices queueFamilyIndices = __findQueueFamilies (physicalDevice);
 
         VkCommandPoolCreateInfo poolInfo = {};
@@ -488,7 +509,8 @@ private:
         }
     }
 
-    void createCommandBuffers () {
+    void createCommandBuffers ()
+    {
         commandBuffers.resize (swapChainFramebuffers.size ());
 
         VkCommandBufferAllocateInfo allocInfo = {};
@@ -533,7 +555,8 @@ private:
         }
     }
 
-    void createSemaphores () {
+    void createSemaphores ()
+    {
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -544,7 +567,8 @@ private:
         }
     }
 
-    void drawFrame () {
+    void drawFrame ()
+    {
         uint32_t imageIndex;
         vkAcquireNextImageKHR (device, swapChain, std::numeric_limits<uint64_t>::max (), imageAvailableSemaphore,
                                VK_NULL_HANDLE, &imageIndex);
@@ -584,7 +608,8 @@ private:
         vkQueuePresentKHR (presentQueue, &presentInfo);
     }
 
-    void createShaderModule (const std::vector<char> &code, vk::ptr<VkShaderModule> &shaderModule) {
+    void createShaderModule (const std::vector<char> &code, vk::ptr<VkShaderModule> &shaderModule)
+    {
         VkShaderModuleCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         createInfo.codeSize = code.size ();
@@ -595,22 +620,8 @@ private:
         }
     }
 
-    VkSurfaceFormatKHR chooseSwapSurfaceFormat (const std::vector<VkSurfaceFormatKHR> &availableFormats) {
-        if (availableFormats.size () == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED) {
-            return {VK_FORMAT_B8G8R8A8_UNORM, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
-        }
-
-        for (const auto &availableFormat : availableFormats) {
-            if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
-                availableFormat.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR) {
-                return availableFormat;
-            }
-        }
-
-        return availableFormats[0];
-    }
-
-    VkPresentModeKHR chooseSwapPresentMode (const std::vector<VkPresentModeKHR> availablePresentModes) {
+    VkPresentModeKHR chooseSwapPresentMode (const std::vector<VkPresentModeKHR> availablePresentModes)
+    {
         for (const auto &availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
                 return availablePresentMode;
@@ -620,7 +631,8 @@ private:
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
-    VkExtent2D chooseSwapExtent (const VkSurfaceCapabilitiesKHR &capabilities) {
+    VkExtent2D chooseSwapExtent (const VkSurfaceCapabilitiesKHR &capabilities)
+    {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max ()) {
             return capabilities.currentExtent;
         } else {
@@ -636,7 +648,8 @@ private:
     }
 
 
-    bool isDeviceSuitable (vk::PhysicalDevice device) {
+    bool isDeviceSuitable (vk::PhysicalDevice device)
+    {
         QueueFamilyIndices indices = findQueueFamilies (device);
 
         bool extensionsSupported = checkDeviceExtensionSupport (device);
@@ -650,7 +663,8 @@ private:
         return indices.isComplete () && extensionsSupported && swapChainAdequate;
     }
 
-    bool checkDeviceExtensionSupport (VkPhysicalDevice device) {
+    bool checkDeviceExtensionSupport (VkPhysicalDevice device)
+    {
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties (device, nullptr, &extensionCount, nullptr);
 
@@ -667,7 +681,8 @@ private:
     }
 
 
-    QueueFamilyIndices findQueueFamilies (vk::PhysicalDevice device) {
+    QueueFamilyIndices findQueueFamilies (vk::PhysicalDevice device)
+    {
         QueueFamilyIndices indices;
 
         auto queueFamilies = device.getQueueFamilyProperties ();
@@ -696,7 +711,8 @@ private:
         return indices;
     }
 
-    QueueFamilyIndices __findQueueFamilies (vk::PhysicalDevice device) {
+    QueueFamilyIndices __findQueueFamilies (vk::PhysicalDevice device)
+    {
         QueueFamilyIndices indices;
 
         uint32_t queueFamilyCount = 0;
@@ -728,7 +744,8 @@ private:
         return indices;
     }
 
-    std::vector<const char *> getRequiredExtensions () {
+    std::vector<const char *> getRequiredExtensions ()
+    {
         std::vector<const char *> extensions;
 
         unsigned int glfwExtensionCount = 0;
@@ -746,7 +763,8 @@ private:
         return extensions;
     }
 
-    bool checkValidationLayerSupport () {
+    bool checkValidationLayerSupport ()
+    {
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties (&layerCount, nullptr);
 
@@ -773,14 +791,16 @@ private:
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL
     debugCallback (VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location,
-                   int32_t code, const char *layerPrefix, const char *msg, void *userData) {
+                   int32_t code, const char *layerPrefix, const char *msg, void *userData)
+    {
         std::cerr << "validation layer: " << msg << std::endl;
 
         return VK_FALSE;
     }
 };
 
-int main () {
+int main ()
+{
     HelloTriangleApplication app;
 
     try {

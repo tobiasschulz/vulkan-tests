@@ -28,7 +28,8 @@ const bool enableValidationLayers = true;
 #endif
 
 VkResult CreateDebugReportCallbackEXT (VkInstance instance, const VkDebugReportCallbackCreateInfoEXT *pCreateInfo,
-                                       const VkAllocationCallbacks *pAllocator, VkDebugReportCallbackEXT *pCallback) {
+                                       const VkAllocationCallbacks *pAllocator, VkDebugReportCallbackEXT *pCallback)
+{
     auto func = (PFN_vkCreateDebugReportCallbackEXT) vkGetInstanceProcAddr (instance, "vkCreateDebugReportCallbackEXT");
     if (func != nullptr) {
         return func (instance, pCreateInfo, pAllocator, pCallback);
@@ -38,7 +39,8 @@ VkResult CreateDebugReportCallbackEXT (VkInstance instance, const VkDebugReportC
 }
 
 void DestroyDebugReportCallbackEXT (VkInstance instance, VkDebugReportCallbackEXT callback,
-                                    const VkAllocationCallbacks *pAllocator) {
+                                    const VkAllocationCallbacks *pAllocator)
+{
     auto func = (PFN_vkDestroyDebugReportCallbackEXT) vkGetInstanceProcAddr (instance,
                                                                              "vkDestroyDebugReportCallbackEXT");
     if (func != nullptr) {
@@ -47,41 +49,51 @@ void DestroyDebugReportCallbackEXT (VkInstance instance, VkDebugReportCallbackEX
 }
 
 template<typename T>
-class VDeleter {
+class VDeleter
+{
 public:
-    VDeleter () : VDeleter ([] (T, VkAllocationCallbacks *) {}) {}
+    VDeleter () : VDeleter ([] (T, VkAllocationCallbacks *) {})
+    {}
 
-    VDeleter (std::function<void (T, VkAllocationCallbacks *)> deletef) {
+    VDeleter (std::function<void (T, VkAllocationCallbacks *)> deletef)
+    {
         this->deleter = [=] (T obj) { deletef (obj, nullptr); };
     }
 
     VDeleter (const VDeleter<VkInstance> &instance,
-              std::function<void (VkInstance, T, VkAllocationCallbacks *)> deletef) {
+              std::function<void (VkInstance, T, VkAllocationCallbacks *)> deletef)
+    {
         this->deleter = [&instance, deletef] (T obj) { deletef (instance, obj, nullptr); };
     }
 
-    VDeleter (const VDeleter<VkDevice> &device, std::function<void (VkDevice, T, VkAllocationCallbacks *)> deletef) {
+    VDeleter (const VDeleter<VkDevice> &device, std::function<void (VkDevice, T, VkAllocationCallbacks *)> deletef)
+    {
         this->deleter = [&device, deletef] (T obj) { deletef (device, obj, nullptr); };
     }
 
-    ~VDeleter () {
+    ~VDeleter ()
+    {
         cleanup ();
     }
 
-    const T *operator& () const {
+    const T *operator& () const
+    {
         return &object;
     }
 
-    T *replace () {
+    T *replace ()
+    {
         cleanup ();
         return &object;
     }
 
-    operator T () const {
+    operator T () const
+    {
         return object;
     }
 
-    void operator= (T rhs) {
+    void operator= (T rhs)
+    {
         if (rhs != object) {
             cleanup ();
             object = rhs;
@@ -89,7 +101,8 @@ public:
     }
 
     template<typename V>
-    bool operator== (V rhs) {
+    bool operator== (V rhs)
+    {
         return object == T (rhs);
     }
 
@@ -97,7 +110,8 @@ private:
     T object{VK_NULL_HANDLE};
     std::function<void (T)> deleter;
 
-    void cleanup () {
+    void cleanup ()
+    {
         if (object != VK_NULL_HANDLE) {
             deleter (object);
         }
@@ -105,24 +119,29 @@ private:
     }
 };
 
-struct QueueFamilyIndices {
+struct QueueFamilyIndices
+{
     int graphicsFamily = -1;
     int presentFamily = -1;
 
-    bool isComplete () {
+    bool isComplete ()
+    {
         return graphicsFamily >= 0 && presentFamily >= 0;
     }
 };
 
-struct SwapChainSupportDetails {
+struct SwapChainSupportDetails
+{
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-class HelloTriangleApplication {
+class HelloTriangleApplication
+{
 public:
-    void run () {
+    void run ()
+    {
         initWindow ();
         initVulkan ();
         mainLoop ();
@@ -158,7 +177,8 @@ private:
     VDeleter<VkSemaphore> imageAvailableSemaphore{device, vkDestroySemaphore};
     VDeleter<VkSemaphore> renderFinishedSemaphore{device, vkDestroySemaphore};
 
-    void initWindow () {
+    void initWindow ()
+    {
         glfwInit ();
 
         glfwWindowHint (GLFW_CLIENT_API, GLFW_NO_API);
@@ -167,7 +187,8 @@ private:
         window = glfwCreateWindow (WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
     }
 
-    void initVulkan () {
+    void initVulkan ()
+    {
         createInstance ();
         setupDebugCallback ();
         createSurface ();
@@ -183,7 +204,8 @@ private:
         createSemaphores ();
     }
 
-    void mainLoop () {
+    void mainLoop ()
+    {
         while (!glfwWindowShouldClose (window)) {
             glfwPollEvents ();
             drawFrame ();
@@ -194,7 +216,8 @@ private:
         glfwDestroyWindow (window);
     }
 
-    void createInstance () {
+    void createInstance ()
+    {
         if (enableValidationLayers && !checkValidationLayerSupport ()) {
             throw std::runtime_error ("validation layers requested, but not available!");
         }
@@ -227,7 +250,8 @@ private:
         }
     }
 
-    void setupDebugCallback () {
+    void setupDebugCallback ()
+    {
         if (!enableValidationLayers)
             return;
 
@@ -241,13 +265,15 @@ private:
         }
     }
 
-    void createSurface () {
+    void createSurface ()
+    {
         if (glfwCreateWindowSurface (instance, window, nullptr, surface.replace ()) != VK_SUCCESS) {
             throw std::runtime_error ("failed to create window surface!");
         }
     }
 
-    void pickPhysicalDevice () {
+    void pickPhysicalDevice ()
+    {
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices (instance, &deviceCount, nullptr);
 
@@ -270,7 +296,8 @@ private:
         }
     }
 
-    void createLogicalDevice () {
+    void createLogicalDevice ()
+    {
         QueueFamilyIndices indices = findQueueFamilies (physicalDevice);
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -314,7 +341,8 @@ private:
         vkGetDeviceQueue (device, indices.presentFamily, 0, &presentQueue);
     }
 
-    void createSwapChain () {
+    void createSwapChain ()
+    {
         SwapChainSupportDetails swapChainSupport = querySwapChainSupport (physicalDevice);
 
         VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat (swapChainSupport.formats);
@@ -368,7 +396,8 @@ private:
         swapChainExtent = extent;
     }
 
-    void createImageViews () {
+    void createImageViews ()
+    {
         swapChainImageViews.resize (swapChainImages.size (), VDeleter<VkImageView>{device, vkDestroyImageView});
 
         for (uint32_t i = 0; i < swapChainImages.size (); i++) {
@@ -393,7 +422,8 @@ private:
         }
     }
 
-    void createRenderPass () {
+    void createRenderPass ()
+    {
         VkAttachmentDescription colorAttachment = {};
         colorAttachment.format = swapChainImageFormat;
         colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -435,7 +465,8 @@ private:
         }
     }
 
-    void createGraphicsPipeline () {
+    void createGraphicsPipeline ()
+    {
         auto vertShaderCode = readFile ("shader1.vert.spv");
         auto fragShaderCode = readFile ("shader1.frag.spv");
 
@@ -550,7 +581,8 @@ private:
         }
     }
 
-    void createFramebuffers () {
+    void createFramebuffers ()
+    {
         swapChainFramebuffers.resize (swapChainImageViews.size (),
                                       VDeleter<VkFramebuffer>{device, vkDestroyFramebuffer});
 
@@ -574,7 +606,8 @@ private:
         }
     }
 
-    void createCommandPool () {
+    void createCommandPool ()
+    {
         QueueFamilyIndices queueFamilyIndices = findQueueFamilies (physicalDevice);
 
         VkCommandPoolCreateInfo poolInfo = {};
@@ -586,7 +619,8 @@ private:
         }
     }
 
-    void createCommandBuffers () {
+    void createCommandBuffers ()
+    {
         commandBuffers.resize (swapChainFramebuffers.size ());
 
         VkCommandBufferAllocateInfo allocInfo = {};
@@ -631,7 +665,8 @@ private:
         }
     }
 
-    void createSemaphores () {
+    void createSemaphores ()
+    {
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -642,7 +677,8 @@ private:
         }
     }
 
-    void drawFrame () {
+    void drawFrame ()
+    {
         uint32_t imageIndex;
         vkAcquireNextImageKHR (device, swapChain, std::numeric_limits<uint64_t>::max (), imageAvailableSemaphore,
                                VK_NULL_HANDLE, &imageIndex);
@@ -682,7 +718,8 @@ private:
         vkQueuePresentKHR (presentQueue, &presentInfo);
     }
 
-    void createShaderModule (const std::vector<char> &code, VDeleter<VkShaderModule> &shaderModule) {
+    void createShaderModule (const std::vector<char> &code, VDeleter<VkShaderModule> &shaderModule)
+    {
         VkShaderModuleCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         createInfo.codeSize = code.size ();
@@ -693,7 +730,8 @@ private:
         }
     }
 
-    VkSurfaceFormatKHR chooseSwapSurfaceFormat (const std::vector<VkSurfaceFormatKHR> &availableFormats) {
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat (const std::vector<VkSurfaceFormatKHR> &availableFormats)
+    {
         if (availableFormats.size () == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED) {
             return {VK_FORMAT_B8G8R8A8_UNORM, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
         }
@@ -708,7 +746,8 @@ private:
         return availableFormats[0];
     }
 
-    VkPresentModeKHR chooseSwapPresentMode (const std::vector<VkPresentModeKHR> availablePresentModes) {
+    VkPresentModeKHR chooseSwapPresentMode (const std::vector<VkPresentModeKHR> availablePresentModes)
+    {
         for (const auto &availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
                 return availablePresentMode;
@@ -718,7 +757,8 @@ private:
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
-    VkExtent2D chooseSwapExtent (const VkSurfaceCapabilitiesKHR &capabilities) {
+    VkExtent2D chooseSwapExtent (const VkSurfaceCapabilitiesKHR &capabilities)
+    {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max ()) {
             return capabilities.currentExtent;
         } else {
@@ -733,7 +773,8 @@ private:
         }
     }
 
-    SwapChainSupportDetails querySwapChainSupport (VkPhysicalDevice device) {
+    SwapChainSupportDetails querySwapChainSupport (VkPhysicalDevice device)
+    {
         SwapChainSupportDetails details;
 
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR (device, surface, &details.capabilities);
@@ -758,7 +799,8 @@ private:
         return details;
     }
 
-    bool isDeviceSuitable (VkPhysicalDevice device) {
+    bool isDeviceSuitable (VkPhysicalDevice device)
+    {
         QueueFamilyIndices indices = findQueueFamilies (device);
 
         bool extensionsSupported = checkDeviceExtensionSupport (device);
@@ -772,7 +814,8 @@ private:
         return indices.isComplete () && extensionsSupported && swapChainAdequate;
     }
 
-    bool checkDeviceExtensionSupport (VkPhysicalDevice device) {
+    bool checkDeviceExtensionSupport (VkPhysicalDevice device)
+    {
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties (device, nullptr, &extensionCount, nullptr);
 
@@ -788,7 +831,8 @@ private:
         return requiredExtensions.empty ();
     }
 
-    QueueFamilyIndices findQueueFamilies (VkPhysicalDevice device) {
+    QueueFamilyIndices findQueueFamilies (VkPhysicalDevice device)
+    {
         QueueFamilyIndices indices;
 
         uint32_t queueFamilyCount = 0;
@@ -820,7 +864,8 @@ private:
         return indices;
     }
 
-    std::vector<const char *> getRequiredExtensions () {
+    std::vector<const char *> getRequiredExtensions ()
+    {
         std::vector<const char *> extensions;
 
         unsigned int glfwExtensionCount = 0;
@@ -838,7 +883,8 @@ private:
         return extensions;
     }
 
-    bool checkValidationLayerSupport () {
+    bool checkValidationLayerSupport ()
+    {
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties (&layerCount, nullptr);
 
@@ -865,14 +911,16 @@ private:
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL
     debugCallback (VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location,
-                   int32_t code, const char *layerPrefix, const char *msg, void *userData) {
+                   int32_t code, const char *layerPrefix, const char *msg, void *userData)
+    {
         std::cerr << "validation layer: " << msg << std::endl;
 
         return VK_FALSE;
     }
 };
 
-int main () {
+int main ()
+{
     HelloTriangleApplication app;
 
     try {
