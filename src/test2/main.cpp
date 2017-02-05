@@ -476,11 +476,14 @@ private:
         vk::SubmitInfo submitInfo;
 
         submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = (const vk::Semaphore[]) { *imageAvailableSemaphore };
-        submitInfo.pWaitDstStageMask = (const vk::PipelineStageFlags[]) { vk::PipelineStageFlagBits::eColorAttachmentOutput };
+        const vk::Semaphore pWaitSemaphores[] = { *imageAvailableSemaphore };
+        submitInfo.pWaitSemaphores = pWaitSemaphores;
+        const vk::PipelineStageFlags pWaitDstStageMask[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
+        submitInfo.pWaitDstStageMask = pWaitDstStageMask;
 
+        const vk::CommandBuffer pCommandBuffers[] = { *commandBuffers[imageIndex] };
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = (const vk::CommandBuffer[]) { *commandBuffers[imageIndex] };
+        submitInfo.pCommandBuffers = pCommandBuffers;
 
         vk::Semaphore signalSemaphores[] = { *renderFinishedSemaphore };
 
@@ -495,8 +498,9 @@ private:
         vk::PresentInfoKHR presentInfo;
         presentInfo.waitSemaphoreCount = 1;
         presentInfo.pWaitSemaphores = signalSemaphores;
+        const vk::SwapchainKHR pSwapchains[] = { *swapChain };
         presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = (const vk::SwapchainKHR[]) { *swapChain };
+        presentInfo.pSwapchains = pSwapchains;
 
         presentInfo.pImageIndices = &imageIndex;
 
