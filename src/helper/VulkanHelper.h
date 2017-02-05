@@ -6,25 +6,20 @@
 #define VULKANTEST_VULKANHELPER_H
 
 #include "../helper/vulkan.h"
+#include "SwapChainSupport.h"
+#include "QueueFamilies.h"
+#include "Shader.h"
 
-class SwapChainSupportDetails
-{
-public:
-    vk::SurfaceCapabilitiesKHR capabilities;
-    std::vector<vk::SurfaceFormatKHR> formats;
-    std::vector<vk::PresentModeKHR> presentModes;
-
-    vk::SurfaceFormatKHR chooseSwapSurfaceFormat ();
-
-};
-
-class VulkanHelper
+namespace helper
 {
 
-public:
-    static SwapChainSupportDetails querySwapChainSupport (vk::SurfaceKHR surface, vk::PhysicalDevice device);
+    class VulkanHelper
+    {
 
-};
+    public:
 
+    };
+
+}
 
 #endif //VULKANTEST_VULKANHELPER_H

@@ -1,7 +1,7 @@
 #include "main.h"
 
 #include "../helper/vulkan.h"
-#include "../common/io.h"
+#include "../helper/io.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -467,8 +467,8 @@ private:
 
     void createGraphicsPipeline ()
     {
-        auto vertShaderCode = readFile ("shader1.vert.spv");
-        auto fragShaderCode = readFile ("shader1.frag.spv");
+        auto vertShaderCode = helper::io::readFile ("shader1.vert.spv");
+        auto fragShaderCode = helper::io::readFile ("shader1.frag.spv");
 
         VDeleter<VkShaderModule> vertShaderModule{device, vkDestroyShaderModule};
         VDeleter<VkShaderModule> fragShaderModule{device, vkDestroyShaderModule};

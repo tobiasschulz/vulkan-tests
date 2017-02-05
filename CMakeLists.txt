@@ -30,9 +30,9 @@ include_directories(SYSTEM
         "${3RD_PARTY_DIR}/glfw/include"
         "${3RD_PARTY_DIR}/glm"
         "${VULKAN_INCLUDE_DIR}"
-)
+        )
 
-MESSAGE( STATUS "VULKAN_INCLUDE_DIR: " ${VULKAN_INCLUDE_DIR} )
+MESSAGE(STATUS "VULKAN_INCLUDE_DIR: " ${VULKAN_INCLUDE_DIR})
 
 
 add_definitions(
@@ -49,15 +49,37 @@ endif (UNIX)
 # TEST 1
 add_executable("vulkantest_1"
         src/test1/main.cpp
-        src/common/io.cpp
+        src/test1/main.h
+        src/helper/io.cpp
+        src/helper/io.h
         3rdparty/backward/backward.cpp
-        src/helper/VulkanHelper.cpp src/helper/VulkanHelper.h)
+        3rdparty/backward/backward.hpp
+        src/helper/VulkanHelper.cpp
+        src/helper/VulkanHelper.h
+        src/helper/SwapChainSupport.cpp
+        src/helper/SwapChainSupport.h
+        src/helper/QueueFamilies.cpp
+        src/helper/QueueFamilies.h
+        src/helper/Shader.cpp
+        src/helper/Shader.h
+)
 target_link_libraries(vulkantest_1 ${COMMON_LINK_LIBS})
 
 # TEST 2
 add_executable("vulkantest_2"
         src/test2/main.cpp
-        src/common/io.cpp
+        src/test2/main.h
+        src/helper/io.cpp
+        src/helper/io.h
         3rdparty/backward/backward.cpp
-        src/helper/VulkanHelper.cpp src/helper/VulkanHelper.h)
+        3rdparty/backward/backward.hpp
+        src/helper/VulkanHelper.cpp
+        src/helper/VulkanHelper.h
+        src/helper/SwapChainSupport.cpp
+        src/helper/SwapChainSupport.h
+        src/helper/QueueFamilies.cpp
+        src/helper/QueueFamilies.h
+        src/helper/Shader.cpp
+        src/helper/Shader.h
+)
 target_link_libraries(vulkantest_2 ${COMMON_LINK_LIBS})

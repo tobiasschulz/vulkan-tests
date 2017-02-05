@@ -21,12 +21,12 @@ namespace vk
             this->deleter = [=] (T obj) { deletef (obj, nullptr); };
         }
 
-        ptr (const ptr<VkInstance> &instance, std::function<void (VkInstance, T, VkAllocationCallbacks * )> deletef)
+        ptr (const ptr<VkInstance> &instance, std::function<void (VkInstance, T, VkAllocationCallbacks *)> deletef)
         {
             this->deleter = [&instance, deletef] (T obj) { deletef (instance, obj, nullptr); };
         }
 
-        ptr (const ptr<VkDevice> &device, std::function<void (VkDevice, T, VkAllocationCallbacks * )> deletef)
+        ptr (const ptr<VkDevice> &device, std::function<void (VkDevice, T, VkAllocationCallbacks *)> deletef)
         {
             this->deleter = [&device, deletef] (T obj) { deletef (device, obj, nullptr); };
         }
