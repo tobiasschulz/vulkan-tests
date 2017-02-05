@@ -40,9 +40,8 @@ public:
 private:
     GLFWwindow *window;
 
-    vk::UniqueInstance instance;
     vk::UniqueDebugReportCallbackEXT callback;
-    vk::UniqueSurfaceKHR surface;
+    vk::SurfaceKHR surface;
 
     vk::PhysicalDevice physicalDevice;
     vk::UniqueDevice device;
@@ -66,6 +65,8 @@ private:
 
     vk::UniqueSemaphore imageAvailableSemaphore;
     vk::UniqueSemaphore renderFinishedSemaphore;
+
+    vk::UniqueInstance instance;
 
     void initWindow ()
     {
@@ -150,14 +151,14 @@ private:
         if (glfwCreateWindowSurface (((VkInstance) instance.get ()), window, nullptr, &result) != VK_SUCCESS) {
             throw std::runtime_error ("failed to create window surface!");
         }
-        surface = vk::UniqueSurfaceKHR (result);
+        surface = vk::SurfaceKHR (result);
     }
 
     void pickPhysicalDevice ()
     {
         auto physicalDevices = instance->enumeratePhysicalDevices ();
         for (const auto &pd : physicalDevices) {
-            if (helper::SwapChainSupport::isDeviceSuitable (*surface, pd, REQUIRED_EXTENSIONS)) {
+            if (helper::SwapChainSupport::isDeviceSuitable (surface, pd, REQUIRED_EXTENSIONS)) {
                 physicalDevice = pd;
                 break;
             }
@@ -170,7 +171,7 @@ private:
 
     void createLogicalDevice ()
     {
-        helper::QueueFamilies indices = helper::QueueFamilies::findQueueFamilies (*surface, physicalDevice);
+        helper::QueueFamilies indices = helper::QueueFamilies::findQueueFamilies (surface, physicalDevice);
 
         std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
         std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
@@ -203,13 +204,13 @@ private:
 
     void createSwapChain ()
     {
-        helper::SwapChainSupport s = helper::SwapChainSupport::querySwapChainSupport (*surface, physicalDevice);
+        helper::SwapChainSupport s = helper::SwapChainSupport::querySwapChainSupport (surface, physicalDevice);
 
         vk::SurfaceFormatKHR surfaceFormat = s.chooseSwapSurfaceFormat ();
         vk::PresentModeKHR presentMode = s.chooseSwapPresentMode ();
         vk::Extent2D extent = s.chooseSwapExtent (WIDTH, HEIGHT);
 
-        vk::SwapchainCreateInfoKHR createInfo ({}, *surface);
+        vk::SwapchainCreateInfoKHR createInfo ({}, surface);
 
         createInfo.minImageCount = s.getImageCount ();
         createInfo.imageFormat = surfaceFormat.format;
@@ -218,7 +219,7 @@ private:
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
 
-        helper::QueueFamilies families = helper::QueueFamilies::findQueueFamilies (*surface, physicalDevice);
+        helper::QueueFamilies families = helper::QueueFamilies::findQueueFamilies (surface, physicalDevice);
         families.apply (createInfo);
 
         createInfo.preTransform = s.capabilities.currentTransform;
@@ -416,7 +417,7 @@ private:
 
     void createCommandPool ()
     {
-        helper::QueueFamilies queueFamilies = helper::QueueFamilies::findQueueFamilies (*surface, physicalDevice);
+        helper::QueueFamilies queueFamilies = helper::QueueFamilies::findQueueFamilies (surface, physicalDevice);
         commandPool = device->createCommandPoolUnique (vk::CommandPoolCreateInfo ({}, queueFamilies.graphicsFamily));
     }
 
