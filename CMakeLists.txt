@@ -85,5 +85,26 @@ add_executable("vulkantest_2"
         src/helper/Shader.h
         src/helper/vulkan.cpp
         src/helper/vulkan.h
-)
+        )
 target_link_libraries(vulkantest_2 ${COMMON_LINK_LIBS})
+
+# TEST 3
+add_executable("vulkantest_3"
+        src/test3/main.cpp
+        src/test3/main.h
+        src/helper/io.cpp
+        src/helper/io.h
+        3rdparty/backward/backward.cpp
+        3rdparty/backward/backward.hpp
+        src/helper/VulkanHelper.cpp
+        src/helper/VulkanHelper.h
+        src/helper/SwapChainSupport.cpp
+        src/helper/SwapChainSupport.h
+        src/helper/QueueFamilies.cpp
+        src/helper/QueueFamilies.h
+        src/helper/Shader.cpp
+        src/helper/Shader.h
+        src/helper/vulkan.cpp
+        src/helper/vulkan.h
+        )
+target_link_libraries(vulkantest_3 ${COMMON_LINK_LIBS})
