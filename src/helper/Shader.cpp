@@ -31,8 +31,8 @@ namespace helper
         return shaderModule.get ();
     }
 
-    vk::PipelineShaderStageCreateInfo Shader::getPipelineShaderStageCreateInfo (std::string name)
+    vk::PipelineShaderStageCreateInfo Shader::getPipelineShaderStageCreateInfo (const char* name)
     {
-        return vk::PipelineShaderStageCreateInfo ({}, stage, getShaderModule (), name.c_str ());
+        return vk::PipelineShaderStageCreateInfo({}, stage, getShaderModule(), name);
     }
 }
