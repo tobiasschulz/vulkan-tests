@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": ["/usr/include", "3rdparty/vulkan-hpp" ],
+            "browse" : {
+                "limitSymbolsToIncludedHeaders" : false,
+                "databaseFilename" : ""
+            }
+        },
+        {
+            "name": "Win32",
+            "includePath": [],
+            "browse" : {
+                "limitSymbolsToIncludedHeaders" : false,
+                "databaseFilename" : ""
+            }
+        }
+    ]
+}
