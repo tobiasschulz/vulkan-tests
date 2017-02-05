@@ -63,8 +63,8 @@ private:
     vk::UniqueCommandPool commandPool;
     std::vector<vk::UniqueCommandBuffer> commandBuffers;
 
-    vk::UniqueSemaphore imageAvailableSemaphore;
-    vk::UniqueSemaphore renderFinishedSemaphore;
+    vk::Semaphore imageAvailableSemaphore;
+    vk::Semaphore renderFinishedSemaphore;
 
     vk::UniqueInstance instance;
 
@@ -457,8 +457,8 @@ private:
 
     void createSemaphores ()
     {
-        imageAvailableSemaphore = device->createSemaphoreUnique (vk::SemaphoreCreateInfo ());
-        renderFinishedSemaphore = device->createSemaphoreUnique (vk::SemaphoreCreateInfo ());
+        imageAvailableSemaphore = device->createSemaphore (vk::SemaphoreCreateInfo ());
+        renderFinishedSemaphore = device->createSemaphore (vk::SemaphoreCreateInfo ());
     }
 
     void drawFrame ()
@@ -468,7 +468,7 @@ private:
         device->acquireNextImageKHR (
                 *swapChain,
                 std::numeric_limits<uint64_t>::max (), // timeout = max 64 bit value
-                *imageAvailableSemaphore,
+                imageAvailableSemaphore,
                 vk::Fence (), // empty fence (no clue what a fence is)
                 &imageIndex
         );
@@ -476,7 +476,7 @@ private:
         vk::SubmitInfo submitInfo;
 
         submitInfo.waitSemaphoreCount = 1;
-        const vk::Semaphore pWaitSemaphores[] = { *imageAvailableSemaphore };
+        const vk::Semaphore pWaitSemaphores[] = { imageAvailableSemaphore };
         submitInfo.pWaitSemaphores = pWaitSemaphores;
         const vk::PipelineStageFlags pWaitDstStageMask[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
         submitInfo.pWaitDstStageMask = pWaitDstStageMask;
@@ -485,7 +485,7 @@ private:
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = pCommandBuffers;
 
-        vk::Semaphore signalSemaphores[] = { *renderFinishedSemaphore };
+        vk::Semaphore signalSemaphores[] = { renderFinishedSemaphore };
 
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
@@ -567,8 +567,10 @@ int main ()
     }
     catch (const std::runtime_error &e) {
         std::cerr << e.what () << std::endl;
+        exit(0);
         return EXIT_FAILURE;
     }
+    exit(0);
 
     return EXIT_SUCCESS;
 }
