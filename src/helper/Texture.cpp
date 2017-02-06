@@ -55,7 +55,9 @@ namespace helper
 
         stbi_image_free (pixels);
 
-        std::tie (textureImage, textureImageMemory) = helper::TextureHelper::createImage (
+        vk::Image _textureImage;
+        vk::DeviceMemory _textureImageMemory;
+        std::tie (_textureImage, _textureImageMemory) = helper::TextureHelper::createImage (
                 renderer,
                 texWidth,
                 texHeight,
@@ -63,6 +65,8 @@ namespace helper
                 vk::ImageTiling::eOptimal, vk::ImageUsageFlags (vk::ImageUsageFlagBits::eTransferDst) | vk::ImageUsageFlagBits::eSampled,
                 vk::MemoryPropertyFlagBits::eDeviceLocal
         );
+        textureImage = vk::UniqueImage(_textureImage);
+        textureImageMemory = vk::UniqueDeviceMemory( _textureImageMemory);
 
         helper::TextureHelper::transitionImageLayout (renderer, stagingImage, vk::Format::eR8G8B8A8Unorm, vk::ImageLayout::ePreinitialized, vk::ImageLayout::eTransferSrcOptimal);
         helper::TextureHelper::transitionImageLayout (renderer, *textureImage, vk::Format::eR8G8B8A8Unorm, vk::ImageLayout::ePreinitialized, vk::ImageLayout::eTransferDstOptimal);

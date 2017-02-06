@@ -335,7 +335,7 @@ private:
 
         vk::DescriptorSetLayoutCreateInfo layoutInfo ({}, (uint32_t) bindings.size (), bindings.data ());
 
-        descriptorSetLayout = device->createDescriptorSetLayout (layoutInfo);
+        descriptorSetLayout = device->createDescriptorSetLayoutUnique (layoutInfo);
     }
 
     void createGraphicsPipeline ()
