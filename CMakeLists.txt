@@ -46,16 +46,14 @@ if (UNIX)
     set(COMMON_LINK_LIBS ${COMMON_LINK_LIBS} bfd)
 endif (UNIX)
 
-# TEST 1
-add_executable("vulkantest_1"
-        src/test1/main.cpp
-        src/test1/main.h
+
+set(SOURCE_COMMON
         src/helper/io.cpp
         src/helper/io.h
         3rdparty/backward/backward.cpp
         3rdparty/backward/backward.hpp
-        src/helper/VulkanHelper.cpp
-        src/helper/VulkanHelper.h
+        src/helper/helpers.cpp
+        src/helper/helpers.h
         src/helper/SwapChainSupport.cpp
         src/helper/SwapChainSupport.h
         src/helper/QueueFamilies.cpp
@@ -64,27 +62,36 @@ add_executable("vulkantest_1"
         src/helper/Shader.h
         src/helper/vulkan.cpp
         src/helper/vulkan.h
+        src/helper/Vertex.cpp
+        src/helper/Vertex.h
+        src/helper/Texture.cpp
+        src/helper/Texture.h
+        src/helper/Mesh.cpp
+        src/helper/Mesh.h
+        src/helper/Renderer.cpp
+        src/helper/Renderer.h
+        src/helper/TextureHelper.cpp
+        src/helper/TextureHelper.h
+        src/helper/BufferHelper.cpp
+        src/helper/BufferHelper.h
+        src/helper/UniformBuffer.cpp
+        src/helper/UniformBuffer.h
+        src/helper/UniformBufferObject.cpp
+        src/helper/UniformBufferObject.h
         )
+
+# TEST 1
+add_executable("vulkantest_1"
+        src/test1/main.cpp
+        src/test1/main.h
+        ${SOURCE_COMMON})
 target_link_libraries(vulkantest_1 ${COMMON_LINK_LIBS})
 
 # TEST 2
 add_executable("vulkantest_2"
         src/test2/main.cpp
         src/test2/main.h
-        src/helper/io.cpp
-        src/helper/io.h
-        3rdparty/backward/backward.cpp
-        3rdparty/backward/backward.hpp
-        src/helper/VulkanHelper.cpp
-        src/helper/VulkanHelper.h
-        src/helper/SwapChainSupport.cpp
-        src/helper/SwapChainSupport.h
-        src/helper/QueueFamilies.cpp
-        src/helper/QueueFamilies.h
-        src/helper/Shader.cpp
-        src/helper/Shader.h
-        src/helper/vulkan.cpp
-        src/helper/vulkan.h
+        ${SOURCE_COMMON}
         )
 target_link_libraries(vulkantest_2 ${COMMON_LINK_LIBS})
 
@@ -92,19 +99,6 @@ target_link_libraries(vulkantest_2 ${COMMON_LINK_LIBS})
 add_executable("vulkantest_3"
         src/test3/main.cpp
         src/test3/main.h
-        src/helper/io.cpp
-        src/helper/io.h
-        3rdparty/backward/backward.cpp
-        3rdparty/backward/backward.hpp
-        src/helper/VulkanHelper.cpp
-        src/helper/VulkanHelper.h
-        src/helper/SwapChainSupport.cpp
-        src/helper/SwapChainSupport.h
-        src/helper/QueueFamilies.cpp
-        src/helper/QueueFamilies.h
-        src/helper/Shader.cpp
-        src/helper/Shader.h
-        src/helper/vulkan.cpp
-        src/helper/vulkan.h
+        ${SOURCE_COMMON}
         )
 target_link_libraries(vulkantest_3 ${COMMON_LINK_LIBS})

@@ -2,8 +2,7 @@
 
 #include "../helper/vulkan.h"
 #include "../helper/io.h"
-#include "../helper/VulkanHelper.h"
-#include "../helper/old.h"
+#include "../helper/helpers.h"
 
 #include <iostream>
 #include <stdexcept>

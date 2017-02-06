@@ -2,8 +2,7 @@
 
 #include "../helper/vulkan.h"
 #include "../helper/io.h"
-#include "../helper/VulkanHelper.h"
-#include "../helper/old.h"
+#include "../helper/helpers.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -27,9 +26,14 @@ bool enableValidationLayers = false;
 bool enableValidationLayers = true;
 #endif
 
-class HelloTriangleApplication
+class HelloTriangleApplication : public helper::Renderer
 {
 public:
+    HelloTriangleApplication () : uniformBuffer (*this)
+    {
+
+    }
+
     void run ()
     {
         initWindow ();
@@ -43,25 +47,23 @@ private:
     vk::UniqueDebugReportCallbackEXT callback;
     vk::SurfaceKHR surface;
 
-    vk::PhysicalDevice physicalDevice;
-    vk::UniqueDevice device;
-
-    vk::Queue graphicsQueue;
-    vk::Queue presentQueue;
-
     vk::UniqueSwapchainKHR swapChain;
 
     std::vector<vk::Image> swapChainImages;
     vk::Format swapChainImageFormat;
-    vk::Extent2D swapChainExtent;
     std::vector<vk::UniqueImageView> swapChainImageViews;
     std::vector<vk::UniqueFramebuffer> swapChainFramebuffers;
+
     vk::UniqueRenderPass renderPass;
+    vk::UniqueDescriptorSetLayout descriptorSetLayout;
     vk::UniquePipelineLayout pipelineLayout;
     vk::UniquePipeline graphicsPipeline;
 
-    vk::UniqueCommandPool commandPool;
     std::vector<vk::UniqueCommandBuffer> commandBuffers;
+
+    std::vector<std::shared_ptr<helper::Texture>> textures;
+    std::vector<std::shared_ptr<helper::Mesh>> meshes;
+    helper::UniformBuffer uniformBuffer;
 
     vk::UniqueSemaphore imageAvailableSemaphore;
     vk::UniqueSemaphore renderFinishedSemaphore;
@@ -91,6 +93,9 @@ private:
         createGraphicsPipeline ();
         createFramebuffers ();
         createCommandPool ();
+        //createTextures ();
+        //createMeshes ();
+        createUniformBuffer ();
         createCommandBuffers ();
         createSemaphores ();
     }
@@ -99,6 +104,7 @@ private:
     {
         while (!glfwWindowShouldClose (window)) {
             glfwPollEvents ();
+            uniformBuffer.update ();
             drawFrame ();
         }
 
@@ -300,19 +306,47 @@ private:
         renderPass = device->createRenderPassUnique (renderPassInfo);
     }
 
+    void createDescriptorSetLayout ()
+    {
+        vk::DescriptorSetLayoutBinding uboLayoutBinding;
+        uboLayoutBinding.binding = 0;
+        uboLayoutBinding.descriptorCount = 1;
+        uboLayoutBinding.descriptorType = vk::DescriptorType::eUniformBuffer;
+        uboLayoutBinding.pImmutableSamplers = nullptr;
+        uboLayoutBinding.stageFlags = vk::ShaderStageFlagBits::eVertex;
+
+        vk::DescriptorSetLayoutBinding samplerLayoutBinding;
+        samplerLayoutBinding.binding = 1;
+        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.descriptorType = vk::DescriptorType::eCombinedImageSampler;
+        samplerLayoutBinding.pImmutableSamplers = nullptr;
+        samplerLayoutBinding.stageFlags = vk::ShaderStageFlagBits::eFragment;
+
+        std::array<vk::DescriptorSetLayoutBinding, 2> bindings ({{ uboLayoutBinding, samplerLayoutBinding }});
+
+        vk::DescriptorSetLayoutCreateInfo layoutInfo ({}, (uint32_t) bindings.size (), bindings.data ());
+
+        descriptorSetLayout = device->createDescriptorSetLayout (layoutInfo);
+    }
+
     void createGraphicsPipeline ()
     {
-        helper::Shader vertShader = helper::Shader::loadShader (*device, vk::ShaderStageFlagBits::eVertex, "shader1.vert.spv");
-        helper::Shader fragShader = helper::Shader::loadShader (*device, vk::ShaderStageFlagBits::eFragment, "shader1.frag.spv");
+        helper::Shader vertShader = helper::Shader::loadShader (*device, vk::ShaderStageFlagBits::eVertex, "shader3.vert.spv");
+        helper::Shader fragShader = helper::Shader::loadShader (*device, vk::ShaderStageFlagBits::eFragment, "shader3.frag.spv");
 
         vk::PipelineShaderStageCreateInfo shaderStages[] = {
                 vertShader.getPipelineShaderStageCreateInfo ("main"),
                 fragShader.getPipelineShaderStageCreateInfo ("main"),
         };
 
+        auto bindingDescription = helper::Vertex::getBindingDescription ();
+        auto attributeDescriptions = helper::Vertex::getAttributeDescriptions ();
+
         vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
+        vertexInputInfo.vertexBindingDescriptionCount = 1;
+        vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        vertexInputInfo.vertexAttributeDescriptionCount = (uint32_t) attributeDescriptions.size ();
+        vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data ();
 
         vk::PipelineInputAssemblyStateCreateInfo inputAssembly;
         inputAssembly.topology = vk::PrimitiveTopology::eTriangleList;
@@ -340,7 +374,7 @@ private:
         rasterizer.polygonMode = vk::PolygonMode::eFill;
         rasterizer.lineWidth = 1.0f;
         rasterizer.cullMode = vk::CullModeFlagBits::eBack;
-        rasterizer.frontFace = vk::FrontFace::eClockwise;
+        rasterizer.frontFace = vk::FrontFace::eClockwise; ////////////////
         rasterizer.depthBiasEnable = VK_FALSE;
 
         vk::PipelineMultisampleStateCreateInfo multisampling;
@@ -365,6 +399,8 @@ private:
         vk::PipelineLayoutCreateInfo pipelineLayoutInfo;
         pipelineLayoutInfo.setLayoutCount = 0;
         pipelineLayoutInfo.pushConstantRangeCount = 0;
+        vk::DescriptorSetLayout setLayouts[] = { *descriptorSetLayout };
+        pipelineLayoutInfo.pSetLayouts = setLayouts;
 
         pipelineLayout = device->createPipelineLayoutUnique (pipelineLayoutInfo);
 
@@ -420,6 +456,26 @@ private:
         helper::QueueFamilies queueFamilies = helper::QueueFamilies::findQueueFamilies (surface, physicalDevice);
         commandPool = device->createCommandPoolUnique (vk::CommandPoolCreateInfo ({}, queueFamilies.graphicsFamily));
     }
+
+    void createTextures ()
+    {
+        std::shared_ptr<helper::Texture> tex1 = std::make_shared<helper::Texture> (*this, "test.png");
+        textures.push_back (tex1);
+    }
+
+    void createMeshes ()
+    {
+
+        std::shared_ptr<helper::Mesh> mesh1 = std::make_shared<helper::Mesh> (*this);
+        meshes.push_back (mesh1);
+    }
+
+
+    void createUniformBuffer ()
+    {
+        uniformBuffer.create ();
+    }
+
 
     void createCommandBuffers ()
     {
