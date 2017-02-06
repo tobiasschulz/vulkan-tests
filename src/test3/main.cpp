@@ -16,7 +16,10 @@
 const int WIDTH = 800;
 const int HEIGHT = 600;
 
-const std::vector<const char *> VALIDATION_LAYERS = { "VK_LAYER_LUNARG_standard_validation", };
+const std::vector<const char *> VALIDATION_LAYERS = {
+        "VK_LAYER_LUNARG_standard_validation",
+        // "VK_LAYER_LUNARG_api_dump",
+};
 
 const std::vector<const char *> REQUIRED_EXTENSIONS = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, };
 
