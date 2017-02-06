@@ -16,7 +16,7 @@ namespace helper
     {
     public:
         vk::ShaderModule getShaderModule ();
-        vk::PipelineShaderStageCreateInfo getPipelineShaderStageCreateInfo (std::string name);
+        vk::PipelineShaderStageCreateInfo getPipelineShaderStageCreateInfo (const char* name);
 
         static Shader loadShader (const vk::Device &device, vk::ShaderStageFlagBits stage, const std::string &&filename);
         static Shader loadShader (const vk::Device &device, vk::ShaderStageFlagBits stage, std::vector<char> code);
