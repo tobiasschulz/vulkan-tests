@@ -18,14 +18,14 @@ namespace helper
     public:
         Texture (helper::Renderer &renderer, std::string filename);
 
-    private:
-        std::string filename;
-        helper::Renderer &renderer;
-
         vk::UniqueImage textureImage;
         vk::UniqueDeviceMemory textureImageMemory;
         vk::UniqueImageView textureImageView;
         vk::UniqueSampler textureSampler;
+
+    private:
+        std::string filename;
+        helper::Renderer &renderer;
     };
 
 }

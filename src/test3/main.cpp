@@ -65,6 +65,9 @@ private:
     std::vector<std::shared_ptr<helper::Mesh>> meshes;
     helper::UniformBuffer uniformBuffer;
 
+    vk::UniqueDescriptorPool descriptorPool;
+    vk::UniqueDescriptorSet descriptorSet;
+
     vk::Semaphore imageAvailableSemaphore;
     vk::Semaphore renderFinishedSemaphore;
 
@@ -90,12 +93,15 @@ private:
         createSwapChain ();
         createImageViews ();
         createRenderPass ();
+        createDescriptorSetLayout ();
         createGraphicsPipeline ();
         createFramebuffers ();
         createCommandPool ();
-        //createTextures ();
-        //createMeshes ();
+        createTextures ();
+        createMeshes ();
         createUniformBuffer ();
+        createDescriptorPool ();
+        createDescriptorSet ();
         createCommandBuffers ();
         createSemaphores ();
     }
@@ -397,7 +403,7 @@ private:
         colorBlending.blendConstants[3] = 0.0f;
 
         vk::PipelineLayoutCreateInfo pipelineLayoutInfo;
-        pipelineLayoutInfo.setLayoutCount = 0;
+        pipelineLayoutInfo.setLayoutCount = 1;
         pipelineLayoutInfo.pushConstantRangeCount = 0;
         vk::DescriptorSetLayout setLayouts[] = { *descriptorSetLayout };
         pipelineLayoutInfo.pSetLayouts = setLayouts;
@@ -476,6 +482,67 @@ private:
         uniformBuffer.create ();
     }
 
+    void createDescriptorPool ()
+    {
+        std::array<vk::DescriptorPoolSize, 2> poolSizes;
+        poolSizes[0].type = vk::DescriptorType::eUniformBuffer;
+        poolSizes[0].descriptorCount = 1;
+        poolSizes[1].type = vk::DescriptorType::eCombinedImageSampler;
+        poolSizes[1].descriptorCount = 1;
+
+        vk::DescriptorPoolCreateInfo poolInfo;
+        poolInfo.poolSizeCount = (uint32_t) poolSizes.size ();
+        poolInfo.pPoolSizes = poolSizes.data ();
+        poolInfo.maxSets = 1;
+
+        descriptorPool = device->createDescriptorPoolUnique (poolInfo);
+    }
+
+    void createDescriptorSet ()
+    {
+        vk::DescriptorSetLayout layouts[] = { *descriptorSetLayout };
+
+        vk::DescriptorSetAllocateInfo allocInfo = {};
+        allocInfo.descriptorPool = *descriptorPool;
+        allocInfo.descriptorSetCount = 1;
+        allocInfo.pSetLayouts = layouts;
+
+        std::vector<vk::UniqueDescriptorSet> _descriptorSets = device->allocateDescriptorSetsUnique (allocInfo); ////
+        descriptorSet = std::move (_descriptorSets.front ());
+
+        // descriptor writes
+        std::vector<vk::WriteDescriptorSet> descriptorWrites;
+
+        // write uniform buffer object
+        vk::DescriptorBufferInfo uboInfo (*uniformBuffer.uniformBuffer, 0, sizeof (helper::UniformBufferObject));
+        vk::WriteDescriptorSet uboWrite;
+        uboWrite.dstSet = *descriptorSet;
+        uboWrite.dstBinding = 0;
+        uboWrite.dstArrayElement = 0;
+        uboWrite.descriptorType = vk::DescriptorType::eUniformBuffer;
+        uboWrite.descriptorCount = 1;
+        uboWrite.pBufferInfo = &uboInfo;
+        descriptorWrites.push_back (uboWrite);
+
+        // write textures
+        for (uint32_t t = 0; t < textures.size (); t++) {
+            auto &texture = textures[t];
+
+            vk::DescriptorImageInfo imageInfo (*texture->textureSampler, *texture->textureImageView, vk::ImageLayout::eShaderReadOnlyOptimal);
+            vk::WriteDescriptorSet texWrite;
+            texWrite.dstSet = *descriptorSet;
+            texWrite.dstBinding = 1;
+            texWrite.dstArrayElement = 0;
+            texWrite.descriptorType = vk::DescriptorType::eCombinedImageSampler;
+            texWrite.descriptorCount = 1;
+            texWrite.pImageInfo = &imageInfo;
+            descriptorWrites.push_back (texWrite);
+        }
+
+        std::cout << "descriptorWrites: " << descriptorWrites.size () << std::endl;
+
+        device->updateDescriptorSets (descriptorWrites, nullptr);
+    }
 
     void createCommandBuffers ()
     {
@@ -487,7 +554,7 @@ private:
         commandBuffers = device->allocateCommandBuffersUnique (allocInfo);
 
         for (size_t i = 0; i < commandBuffers.size (); i++) {
-            auto &buffer = commandBuffers[i];
+            auto &cmd = commandBuffers[i];
 
             vk::CommandBufferBeginInfo beginInfo (vk::CommandBufferUsageFlagBits::eSimultaneousUse);
 
@@ -498,16 +565,33 @@ private:
             renderPassInfo.renderArea.offset = vk::Offset2D (0, 0);
             renderPassInfo.renderArea.extent = swapChainExtent;
 
-            vk::ClearValue clearColor (vk::ClearColorValue (std::array<float, 4>{{ 0.f, 0.f, 0.f, 1.f }}));
+            vk::ClearValue clearColor = vk::ClearColorValue (std::array<float, 4>{{ 0.f, 0.f, 0.f, 1.f }});
             renderPassInfo.clearValueCount = 1;
             renderPassInfo.pClearValues = &clearColor;
 
-            buffer->begin (beginInfo);
-            buffer->beginRenderPass (renderPassInfo, vk::SubpassContents::eInline);
-            buffer->bindPipeline (vk::PipelineBindPoint::eGraphics, *graphicsPipeline);
-            buffer->draw (3, 1, 0, 0);
-            buffer->endRenderPass ();
-            buffer->end ();
+            cmd->begin (beginInfo);
+            cmd->beginRenderPass (renderPassInfo, vk::SubpassContents::eInline);
+            cmd->bindPipeline (vk::PipelineBindPoint::eGraphics, *graphicsPipeline);
+
+            for (uint32_t m = 0; m < meshes.size (); m++) {
+                auto &mesh = meshes[m];
+
+                cmd->bindVertexBuffers (0, std::array<vk::Buffer, 1>{ mesh->getVertexBuffer () }, std::array<vk::DeviceSize, 1>{ 0 });
+                cmd->bindIndexBuffer (mesh->getIndexBuffer (), 0, vk::IndexType::eUint16);
+
+                cmd->bindDescriptorSets (
+                        vk::PipelineBindPoint::eGraphics,
+                        *pipelineLayout,
+                        0,
+                        std::array<vk::DescriptorSet, 1> { *descriptorSet },
+                        std::array<uint32_t, 0> { }
+                );
+
+                cmd->drawIndexed (mesh->getIndexCount (), 1, 0, 0, 0);
+            }
+
+            cmd->endRenderPass ();
+            cmd->end ();
         }
     }
 
@@ -623,10 +707,10 @@ int main ()
     }
     catch (const std::runtime_error &e) {
         std::cerr << e.what () << std::endl;
-        exit(0);
+        exit (0);
         return EXIT_FAILURE;
     }
-    exit(0);
+    exit (0);
 
     return EXIT_SUCCESS;
 }

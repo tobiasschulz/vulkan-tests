@@ -78,4 +78,25 @@ namespace helper
         }
     }
 
+
+    vk::Buffer Mesh::getVertexBuffer ()
+    {
+        return *vertexBuffer;
+    }
+
+    vk::Buffer Mesh::getIndexBuffer ()
+    {
+        return *indexBuffer;
+    }
+
+    uint32_t Mesh::getVertexCount ()
+    {
+        return (uint32_t) vertices.size ();
+    }
+
+    uint32_t Mesh::getIndexCount ()
+    {
+        return (uint32_t) indices.size ();
+    }
+
 }
