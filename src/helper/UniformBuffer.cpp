@@ -18,19 +18,28 @@ namespace helper
     {
         vk::DeviceSize bufferSize = sizeof (UniformBufferObject);
 
-        std::tie (uniformStagingBuffer, uniformStagingBufferMemory) = helper::BufferHelper::createBuffer (
+        vk::Buffer _uniformStagingBuffer;
+        vk::DeviceMemory _uniformStagingBufferMemory;
+        std::tie (_uniformStagingBuffer, _uniformStagingBufferMemory) = helper::BufferHelper::createBuffer (
                 renderer,
                 bufferSize,
                 vk::BufferUsageFlagBits::eTransferSrc,
                 vk::MemoryPropertyFlags (vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlagBits::eHostCoherent
         );
+        uniformStagingBuffer = vk::UniqueBuffer( _uniformStagingBuffer);
+        uniformStagingBufferMemory = vk::UniqueDeviceMemory( _uniformStagingBufferMemory);
 
-        std::tie (uniformBuffer, uniformBufferMemory) = helper::BufferHelper::createBuffer (
+
+        vk::Buffer _uniformBuffer;
+        vk::DeviceMemory _uniformBufferMemory;
+        std::tie (_uniformBuffer, _uniformBufferMemory) = helper::BufferHelper::createBuffer (
                 renderer,
                 bufferSize,
                 vk::BufferUsageFlags (vk::BufferUsageFlagBits::eTransferDst) | vk::BufferUsageFlagBits::eUniformBuffer,
                 vk::MemoryPropertyFlagBits::eDeviceLocal
         );
+        uniformBuffer = vk::UniqueBuffer(_uniformBuffer);
+        uniformBufferMemory = vk::UniqueDeviceMemory(_uniformBufferMemory);
 
 
     }

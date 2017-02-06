@@ -40,12 +40,16 @@ namespace helper
             memcpy (data, vertices.data (), (size_t) bufferSize);
             device.unmapMemory (stagingBufferMemory);
 
-            std::tie (vertexBuffer, vertexBufferMemory) = helper::BufferHelper::createBuffer (
+            vk::Buffer _vertexBuffer;
+            vk::DeviceMemory _vertexBufferMemory;
+            std::tie (_vertexBuffer, _vertexBufferMemory) = helper::BufferHelper::createBuffer (
                     renderer,
                     bufferSize,
                     vk::BufferUsageFlags (vk::BufferUsageFlagBits::eTransferDst) | vk::BufferUsageFlagBits::eVertexBuffer,
                     vk::MemoryPropertyFlagBits::eDeviceLocal
             );
+            vertexBuffer = vk::UniqueBuffer( _vertexBuffer);
+            vertexBufferMemory = vk::UniqueDeviceMemory( _vertexBufferMemory);
 
             helper::BufferHelper::copyBuffer (renderer, stagingBuffer, *vertexBuffer, bufferSize);
         }
@@ -67,14 +71,18 @@ namespace helper
             memcpy (data, indices.data (), (size_t) bufferSize);
             device.unmapMemory (stagingBufferMemory);
 
-            std::tie (indexBuffer, indexBufferMemory) = helper::BufferHelper::createBuffer (
+            vk::Buffer _indexBuffer;
+            vk::DeviceMemory _indexBufferMemory;
+            std::tie (_indexBuffer, _indexBufferMemory) = helper::BufferHelper::createBuffer (
                     renderer,
                     bufferSize,
                     vk::BufferUsageFlags (vk::BufferUsageFlagBits::eTransferDst) | vk::BufferUsageFlagBits::eIndexBuffer,
                     vk::MemoryPropertyFlagBits::eDeviceLocal
             );
+            indexBuffer = vk::UniqueBuffer(_indexBuffer);
+            indexBufferMemory = vk::UniqueDeviceMemory(_indexBufferMemory);
 
-            helper::BufferHelper::copyBuffer (renderer, stagingBuffer, *vertexBuffer, bufferSize);
+            helper::BufferHelper::copyBuffer (renderer, stagingBuffer, *indexBuffer, bufferSize);
         }
     }
 
