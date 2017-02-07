@@ -17,10 +17,10 @@ namespace helper
     class UniformBuffer
     {
     public:
-        UniformBuffer (helper::Renderer &renderer);
+        UniformBuffer ();
 
-        void create ();
-        void update ();
+        void create (helper::Renderer *renderer);
+        void update (helper::Renderer *renderer, helper::UniformBufferObject ubo);
 
         vk::UniqueBuffer uniformStagingBuffer;
         vk::UniqueDeviceMemory uniformStagingBufferMemory;
@@ -28,7 +28,6 @@ namespace helper
         vk::UniqueDeviceMemory uniformBufferMemory;
 
     private:
-        helper::Renderer &renderer;
 
     };
 

@@ -17,5 +17,6 @@
 #include "Mesh.h"
 #include "Renderer.h"
 #include "BufferHelper.h"
+#include "Camera.h"
 
 #endif //VULKANTEST_VULKANHELPER_H

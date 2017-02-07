@@ -3,65 +3,56 @@
 //
 
 #include "UniformBuffer.h"
-#include <chrono>
 
 namespace helper
 {
 
-    UniformBuffer::UniformBuffer (helper::Renderer &_renderer)
-            : renderer (_renderer)
+    UniformBuffer::UniformBuffer ()
     {
-
     }
 
-    void UniformBuffer::create ()
+    void UniformBuffer::create (helper::Renderer *renderer)
     {
+        if (renderer == nullptr) return;
+
         vk::DeviceSize bufferSize = sizeof (UniformBufferObject);
 
         vk::Buffer _uniformStagingBuffer;
         vk::DeviceMemory _uniformStagingBufferMemory;
         std::tie (_uniformStagingBuffer, _uniformStagingBufferMemory) = helper::BufferHelper::createBuffer (
-                renderer,
+                *renderer,
                 bufferSize,
                 vk::BufferUsageFlagBits::eTransferSrc,
                 vk::MemoryPropertyFlags (vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlagBits::eHostCoherent
         );
-        uniformStagingBuffer = vk::UniqueBuffer( _uniformStagingBuffer);
-        uniformStagingBufferMemory = vk::UniqueDeviceMemory( _uniformStagingBufferMemory);
+        uniformStagingBuffer = vk::UniqueBuffer (_uniformStagingBuffer);
+        uniformStagingBufferMemory = vk::UniqueDeviceMemory (_uniformStagingBufferMemory);
 
 
         vk::Buffer _uniformBuffer;
         vk::DeviceMemory _uniformBufferMemory;
         std::tie (_uniformBuffer, _uniformBufferMemory) = helper::BufferHelper::createBuffer (
-                renderer,
+                *renderer,
                 bufferSize,
                 vk::BufferUsageFlags (vk::BufferUsageFlagBits::eTransferDst) | vk::BufferUsageFlagBits::eUniformBuffer,
                 vk::MemoryPropertyFlagBits::eDeviceLocal
         );
-        uniformBuffer = vk::UniqueBuffer(_uniformBuffer);
-        uniformBufferMemory = vk::UniqueDeviceMemory(_uniformBufferMemory);
+        uniformBuffer = vk::UniqueBuffer (_uniformBuffer);
+        uniformBufferMemory = vk::UniqueDeviceMemory (_uniformBufferMemory);
 
 
     }
 
-    void UniformBuffer::update ()
+    void UniformBuffer::update (helper::Renderer *renderer, helper::UniformBufferObject ubo)
     {
-        static auto startTime = std::chrono::high_resolution_clock::now ();
+        if (renderer == nullptr) return;
+        auto device = renderer->getDevice ();
 
-        auto currentTime = std::chrono::high_resolution_clock::now ();
-        float time = std::chrono::duration_cast<std::chrono::milliseconds> (currentTime - startTime).count () / 1000.0f;
-
-        UniformBufferObject ubo = {};
-        ubo.model = glm::rotate (glm::mat4 (), time * glm::radians (90.0f), glm::vec3 (0.0f, 0.0f, 1.0f));
-        ubo.view = glm::lookAt (glm::vec3 (2.0f, 2.0f, 2.0f), glm::vec3 (0.0f, 0.0f, 0.0f), glm::vec3 (0.0f, 0.0f, 1.0f));
-        ubo.proj = glm::perspective (glm::radians (45.0f), renderer.getSwapChainExtent ().width / (float) renderer.getSwapChainExtent ().height, 0.1f, 10.0f);
-        ubo.proj[1][1] *= -1;
-
-        void *data = renderer.getDevice ().mapMemory (*uniformStagingBufferMemory, 0, sizeof (ubo));
+        void *data = device.mapMemory (*uniformStagingBufferMemory, 0, sizeof (ubo));
         memcpy (data, &ubo, sizeof (ubo));
-        renderer.getDevice ().unmapMemory (*uniformStagingBufferMemory);
+        device.unmapMemory (*uniformStagingBufferMemory);
 
-        helper::BufferHelper::copyBuffer (renderer, *uniformStagingBuffer, *uniformBuffer, sizeof (ubo));
+        helper::BufferHelper::copyBuffer (*renderer, *uniformStagingBuffer, *uniformBuffer, sizeof (ubo));
     }
 
 }

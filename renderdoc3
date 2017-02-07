@@ -1,0 +1,25 @@
+{
+    "rdocCaptureSettings": 1,
+    "settings": {
+        "AutoStart": false,
+        "CmdLine": "",
+        "Environment": [
+        ],
+        "Executable": "/home/tobias/src/vulkan-tests/build/vulkantest_3",
+        "Options": {
+            "APIValidation": 0,
+            "AllowFullscreen": 1,
+            "AllowVSync": 1,
+            "CaptureAllCmdLists": 0,
+            "CaptureCallstacks": 0,
+            "CaptureCallstacksOnlyDraws": 0,
+            "DebugOutputMute": 1,
+            "DelayForDebugger": 0,
+            "HookIntoChildren": 0,
+            "RefAllResources": 0,
+            "SaveAllInitials": 0,
+            "VerifyMapWrites": 0
+        },
+        "WorkingDir": ""
+    }
+}

@@ -32,9 +32,8 @@ bool enableValidationLayers = true;
 class HelloTriangleApplication : public helper::Renderer
 {
 public:
-    HelloTriangleApplication () : uniformBuffer (*this)
+    HelloTriangleApplication ()
     {
-
     }
 
     void run ()
@@ -67,6 +66,7 @@ private:
     std::vector<std::shared_ptr<helper::Texture>> textures;
     std::vector<std::shared_ptr<helper::Mesh>> meshes;
     helper::UniformBuffer uniformBuffer;
+    helper::Camera camera;
 
     vk::UniqueDescriptorPool descriptorPool;
     vk::UniqueDescriptorSet descriptorSet;
@@ -113,7 +113,10 @@ private:
     {
         while (!glfwWindowShouldClose (window)) {
             glfwPollEvents ();
-            uniformBuffer.update ();
+
+            camera.update (this);
+            uniformBuffer.update (this, camera.getUniformBufferObject ());
+
             drawFrame ();
         }
 
@@ -482,7 +485,7 @@ private:
 
     void createUniformBuffer ()
     {
-        uniformBuffer.create ();
+        uniformBuffer.create (this);
     }
 
     void createDescriptorPool ()
@@ -587,7 +590,7 @@ private:
                         *pipelineLayout,
                         0,
                         std::array<vk::DescriptorSet, 1> { *descriptorSet },
-                        std::array<uint32_t, 0> { }
+                        std::array<uint32_t, 0> {}
                 );
 
                 cmd->drawIndexed (mesh->getIndexCount (), 1, 0, 0, 0);

@@ -78,6 +78,8 @@ set(SOURCE_COMMON
         src/helper/UniformBuffer.h
         src/helper/UniformBufferObject.cpp
         src/helper/UniformBufferObject.h
+        src/helper/Camera.cpp
+        src/helper/Camera.h
         )
 
 # TEST 1
