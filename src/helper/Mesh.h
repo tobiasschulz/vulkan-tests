@@ -19,10 +19,10 @@ namespace helper
     public:
         Mesh (helper::Renderer &renderer);
 
-        vk::Buffer getVertexBuffer();
-        uint32_t getVertexCount();
-        vk::Buffer getIndexBuffer();
-        uint32_t getIndexCount();
+        vk::Buffer getVertexBuffer ();
+        uint32_t getVertexCount ();
+        vk::Buffer getIndexBuffer ();
+        uint32_t getIndexCount ();
 
     private:
         helper::Renderer &renderer;

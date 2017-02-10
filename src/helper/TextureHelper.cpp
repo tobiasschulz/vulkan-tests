@@ -61,13 +61,16 @@ namespace helper
         if (oldLayout == vk::ImageLayout::ePreinitialized && newLayout == vk::ImageLayout::eTransferSrcOptimal) {
             barrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
             barrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
-        } else if (oldLayout == vk::ImageLayout::ePreinitialized && newLayout == vk::ImageLayout::eTransferDstOptimal) {
+        }
+        else if (oldLayout == vk::ImageLayout::ePreinitialized && newLayout == vk::ImageLayout::eTransferDstOptimal) {
             barrier.srcAccessMask = vk::AccessFlagBits::eHostWrite;
             barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
-        } else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal) {
+        }
+        else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal) {
             barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
             barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-        } else {
+        }
+        else {
             throw std::invalid_argument ("unsupported layout transition!");
         }
 

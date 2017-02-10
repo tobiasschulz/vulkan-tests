@@ -16,10 +16,10 @@ const int WIDTH = 800;
 const int HEIGHT = 600;
 
 const std::vector<const char *> validationLayers = {
-        "VK_LAYER_LUNARG_standard_validation"};
+        "VK_LAYER_LUNARG_standard_validation" };
 
 const std::vector<const char *> deviceExtensions = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -33,7 +33,8 @@ VkResult CreateDebugReportCallbackEXT (VkInstance instance, const VkDebugReportC
     auto func = (PFN_vkCreateDebugReportCallbackEXT) vkGetInstanceProcAddr (instance, "vkCreateDebugReportCallbackEXT");
     if (func != nullptr) {
         return func (instance, pCreateInfo, pAllocator, pCallback);
-    } else {
+    }
+    else {
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 }
@@ -107,7 +108,7 @@ public:
     }
 
 private:
-    T object{VK_NULL_HANDLE};
+    T object{ VK_NULL_HANDLE };
     std::function<void (T)> deleter;
 
     void cleanup ()
@@ -150,32 +151,32 @@ public:
 private:
     GLFWwindow *window;
 
-    VDeleter<VkInstance> instance{vkDestroyInstance};
-    VDeleter<VkDebugReportCallbackEXT> callback{instance, DestroyDebugReportCallbackEXT};
-    VDeleter<VkSurfaceKHR> surface{instance, vkDestroySurfaceKHR};
+    VDeleter<VkInstance> instance{ vkDestroyInstance };
+    VDeleter<VkDebugReportCallbackEXT> callback{ instance, DestroyDebugReportCallbackEXT };
+    VDeleter<VkSurfaceKHR> surface{ instance, vkDestroySurfaceKHR };
 
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VDeleter<VkDevice> device{vkDestroyDevice};
+    VDeleter<VkDevice> device{ vkDestroyDevice };
 
     VkQueue graphicsQueue;
     VkQueue presentQueue;
 
-    VDeleter<VkSwapchainKHR> swapChain{device, vkDestroySwapchainKHR};
+    VDeleter<VkSwapchainKHR> swapChain{ device, vkDestroySwapchainKHR };
     std::vector<VkImage> swapChainImages;
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
     std::vector<VDeleter<VkImageView>> swapChainImageViews;
     std::vector<VDeleter<VkFramebuffer>> swapChainFramebuffers;
 
-    VDeleter<VkRenderPass> renderPass{device, vkDestroyRenderPass};
-    VDeleter<VkPipelineLayout> pipelineLayout{device, vkDestroyPipelineLayout};
-    VDeleter<VkPipeline> graphicsPipeline{device, vkDestroyPipeline};
+    VDeleter<VkRenderPass> renderPass{ device, vkDestroyRenderPass };
+    VDeleter<VkPipelineLayout> pipelineLayout{ device, vkDestroyPipelineLayout };
+    VDeleter<VkPipeline> graphicsPipeline{ device, vkDestroyPipeline };
 
-    VDeleter<VkCommandPool> commandPool{device, vkDestroyCommandPool};
+    VDeleter<VkCommandPool> commandPool{ device, vkDestroyCommandPool };
     std::vector<VkCommandBuffer> commandBuffers;
 
-    VDeleter<VkSemaphore> imageAvailableSemaphore{device, vkDestroySemaphore};
-    VDeleter<VkSemaphore> renderFinishedSemaphore{device, vkDestroySemaphore};
+    VDeleter<VkSemaphore> imageAvailableSemaphore{ device, vkDestroySemaphore };
+    VDeleter<VkSemaphore> renderFinishedSemaphore{ device, vkDestroySemaphore };
 
     void initWindow ()
     {
@@ -241,7 +242,8 @@ private:
         if (enableValidationLayers) {
             createInfo.enabledLayerCount = validationLayers.size ();
             createInfo.ppEnabledLayerNames = validationLayers.data ();
-        } else {
+        }
+        else {
             createInfo.enabledLayerCount = 0;
         }
 
@@ -301,7 +303,7 @@ private:
         QueueFamilyIndices indices = findQueueFamilies (physicalDevice);
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-        std::set<int> uniqueQueueFamilies = {indices.graphicsFamily, indices.presentFamily};
+        std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
 
         float queuePriority = 1.0f;
         for (int queueFamily : uniqueQueueFamilies) {
@@ -329,7 +331,8 @@ private:
         if (enableValidationLayers) {
             createInfo.enabledLayerCount = validationLayers.size ();
             createInfo.ppEnabledLayerNames = validationLayers.data ();
-        } else {
+        }
+        else {
             createInfo.enabledLayerCount = 0;
         }
 
@@ -367,13 +370,14 @@ private:
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
         QueueFamilyIndices indices = findQueueFamilies (physicalDevice);
-        uint32_t queueFamilyIndices[] = {(uint32_t) indices.graphicsFamily, (uint32_t) indices.presentFamily};
+        uint32_t queueFamilyIndices[] = { (uint32_t) indices.graphicsFamily, (uint32_t) indices.presentFamily };
 
         if (indices.graphicsFamily != indices.presentFamily) {
             createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
             createInfo.queueFamilyIndexCount = 2;
             createInfo.pQueueFamilyIndices = queueFamilyIndices;
-        } else {
+        }
+        else {
             createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         }
 
@@ -398,7 +402,7 @@ private:
 
     void createImageViews ()
     {
-        swapChainImageViews.resize (swapChainImages.size (), VDeleter<VkImageView>{device, vkDestroyImageView});
+        swapChainImageViews.resize (swapChainImages.size (), VDeleter<VkImageView>{ device, vkDestroyImageView });
 
         for (uint32_t i = 0; i < swapChainImages.size (); i++) {
             VkImageViewCreateInfo createInfo = {};
@@ -470,8 +474,8 @@ private:
         auto vertShaderCode = helper::io::readFile ("shader1.vert.spv");
         auto fragShaderCode = helper::io::readFile ("shader1.frag.spv");
 
-        VDeleter<VkShaderModule> vertShaderModule{device, vkDestroyShaderModule};
-        VDeleter<VkShaderModule> fragShaderModule{device, vkDestroyShaderModule};
+        VDeleter<VkShaderModule> vertShaderModule{ device, vkDestroyShaderModule };
+        VDeleter<VkShaderModule> fragShaderModule{ device, vkDestroyShaderModule };
         createShaderModule (vertShaderCode, vertShaderModule);
         createShaderModule (fragShaderCode, fragShaderModule);
 
@@ -487,7 +491,7 @@ private:
         fragShaderStageInfo.module = fragShaderModule;
         fragShaderStageInfo.pName = "main";
 
-        VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
+        VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
         VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -508,7 +512,7 @@ private:
         viewport.maxDepth = 1.0f;
 
         VkRect2D scissor = {};
-        scissor.offset = {0, 0};
+        scissor.offset = { 0, 0 };
         scissor.extent = swapChainExtent;
 
         VkPipelineViewportStateCreateInfo viewportState = {};
@@ -584,11 +588,11 @@ private:
     void createFramebuffers ()
     {
         swapChainFramebuffers.resize (swapChainImageViews.size (),
-                                      VDeleter<VkFramebuffer>{device, vkDestroyFramebuffer});
+                                      VDeleter<VkFramebuffer>{ device, vkDestroyFramebuffer });
 
         for (size_t i = 0; i < swapChainImageViews.size (); i++) {
             VkImageView attachments[] = {
-                    swapChainImageViews[i]};
+                    swapChainImageViews[i] };
 
             VkFramebufferCreateInfo framebufferInfo = {};
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -644,10 +648,10 @@ private:
             renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
             renderPassInfo.renderPass = renderPass;
             renderPassInfo.framebuffer = swapChainFramebuffers[i];
-            renderPassInfo.renderArea.offset = {0, 0};
+            renderPassInfo.renderArea.offset = { 0, 0 };
             renderPassInfo.renderArea.extent = swapChainExtent;
 
-            VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+            VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
             renderPassInfo.clearValueCount = 1;
             renderPassInfo.pClearValues = &clearColor;
 
@@ -686,8 +690,8 @@ private:
         VkSubmitInfo submitInfo = {};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
+        VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
@@ -695,7 +699,7 @@ private:
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
 
-        VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
+        VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
@@ -709,7 +713,7 @@ private:
         presentInfo.waitSemaphoreCount = 1;
         presentInfo.pWaitSemaphores = signalSemaphores;
 
-        VkSwapchainKHR swapChains[] = {swapChain};
+        VkSwapchainKHR swapChains[] = { swapChain };
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
 
@@ -733,7 +737,7 @@ private:
     VkSurfaceFormatKHR chooseSwapSurfaceFormat (const std::vector<VkSurfaceFormatKHR> &availableFormats)
     {
         if (availableFormats.size () == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED) {
-            return {VK_FORMAT_B8G8R8A8_UNORM, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+            return { VK_FORMAT_B8G8R8A8_UNORM, VK_COLORSPACE_SRGB_NONLINEAR_KHR };
         }
 
         for (const auto &availableFormat : availableFormats) {
@@ -761,8 +765,9 @@ private:
     {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max ()) {
             return capabilities.currentExtent;
-        } else {
-            VkExtent2D actualExtent = {WIDTH, HEIGHT};
+        }
+        else {
+            VkExtent2D actualExtent = { WIDTH, HEIGHT };
 
             actualExtent.width = std::max (capabilities.minImageExtent.width,
                                            std::min (capabilities.maxImageExtent.width, actualExtent.width));

@@ -128,7 +128,8 @@ private:
         if (enableValidationLayers) {
             createInfo.enabledLayerCount = (uint32_t) VALIDATION_LAYERS.size ();
             createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data ();
-        } else {
+        }
+        else {
             createInfo.enabledLayerCount = 0;
         }
 
@@ -191,7 +192,8 @@ private:
         if (enableValidationLayers) {
             createInfo.enabledLayerCount = (uint32_t) VALIDATION_LAYERS.size ();
             createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data ();
-        } else {
+        }
+        else {
             createInfo.enabledLayerCount = 0;
         }
 
@@ -566,10 +568,10 @@ int main ()
     }
     catch (const std::runtime_error &e) {
         std::cerr << e.what () << std::endl;
-        exit(0);
+        exit (0);
         return EXIT_FAILURE;
     }
-    exit(0);
+    exit (0);
 
     return EXIT_SUCCESS;
 }

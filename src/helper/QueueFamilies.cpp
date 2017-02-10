@@ -23,7 +23,8 @@ namespace helper
 
             uint32_t queueFamilyIndices[] = { (uint32_t) graphicsFamily, (uint32_t) presentFamily };
             createInfo.pQueueFamilyIndices = queueFamilyIndices;
-        } else {
+        }
+        else {
             createInfo.imageSharingMode = vk::SharingMode::eExclusive;
         }
     }

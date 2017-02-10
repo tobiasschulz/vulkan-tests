@@ -84,6 +84,13 @@ private:
         glfwWindowHint (GLFW_RESIZABLE, GLFW_FALSE);
 
         window = glfwCreateWindow (WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+
+        glfwSetWindowUserPointer (window, this);
+        glfwSetKeyCallback (window, [] (GLFWwindow *window, int key, int scancode, int action, int mods) {
+            // Here we retrieve the pointer we setted before. It will be equal to `this`
+            auto &that = *static_cast<HelloTriangleApplication *>(glfwGetWindowUserPointer (window));
+            that.handleKeypress (window, key, scancode, action, mods);
+        });
     }
 
     void initVulkan ()
@@ -147,7 +154,8 @@ private:
         if (enableValidationLayers) {
             createInfo.enabledLayerCount = (uint32_t) VALIDATION_LAYERS.size ();
             createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data ();
-        } else {
+        }
+        else {
             createInfo.enabledLayerCount = 0;
         }
 
@@ -161,6 +169,16 @@ private:
 
         vk::DebugReportCallbackCreateInfoEXT createInfo (vk::DebugReportFlagBitsEXT::eDebug, debugCallback);
         callback = instance->createDebugReportCallbackEXTUnique (createInfo);
+    }
+
+    void handleKeypress (GLFWwindow *window, int key, int scancode, int action, int mods)
+    {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+            glfwSetWindowShouldClose (window, GL_TRUE);
+        }
+        else {
+            camera.handleKeypress (key, action, mods);
+        }
     }
 
     void createSurface ()
@@ -210,7 +228,8 @@ private:
         if (enableValidationLayers) {
             createInfo.enabledLayerCount = (uint32_t) VALIDATION_LAYERS.size ();
             createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data ();
-        } else {
+        }
+        else {
             createInfo.enabledLayerCount = 0;
         }
 
@@ -582,14 +601,14 @@ private:
             for (uint32_t m = 0; m < meshes.size (); m++) {
                 auto &mesh = meshes[m];
 
-                cmd->bindVertexBuffers (0, std::array<vk::Buffer, 1>{ mesh->getVertexBuffer () }, std::array<vk::DeviceSize, 1>{ 0 });
+                cmd->bindVertexBuffers (0, std::array<vk::Buffer, 1>{{ mesh->getVertexBuffer () }}, std::array<vk::DeviceSize, 1>{{ 0 }});
                 cmd->bindIndexBuffer (mesh->getIndexBuffer (), 0, vk::IndexType::eUint16);
 
                 cmd->bindDescriptorSets (
                         vk::PipelineBindPoint::eGraphics,
                         *pipelineLayout,
                         0,
-                        std::array<vk::DescriptorSet, 1> { *descriptorSet },
+                        std::array<vk::DescriptorSet, 1> {{ *descriptorSet }},
                         std::array<uint32_t, 0> {}
                 );
 

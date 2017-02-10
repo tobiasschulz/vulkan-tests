@@ -43,7 +43,8 @@ namespace helper
 
         if (stagingImageLayout.rowPitch == texWidth * 4) {
             memcpy (data, pixels, (size_t) imageSize);
-        } else {
+        }
+        else {
             uint8_t *dataBytes = reinterpret_cast<uint8_t *>(data);
 
             for (int y = 0; y < texHeight; y++) {
@@ -65,8 +66,8 @@ namespace helper
                 vk::ImageTiling::eOptimal, vk::ImageUsageFlags (vk::ImageUsageFlagBits::eTransferDst) | vk::ImageUsageFlagBits::eSampled,
                 vk::MemoryPropertyFlagBits::eDeviceLocal
         );
-        textureImage = vk::UniqueImage(_textureImage);
-        textureImageMemory = vk::UniqueDeviceMemory( _textureImageMemory);
+        textureImage = vk::UniqueImage (_textureImage);
+        textureImageMemory = vk::UniqueDeviceMemory (_textureImageMemory);
 
         helper::TextureHelper::transitionImageLayout (renderer, stagingImage, vk::Format::eR8G8B8A8Unorm, vk::ImageLayout::ePreinitialized, vk::ImageLayout::eTransferSrcOptimal);
         helper::TextureHelper::transitionImageLayout (renderer, *textureImage, vk::Format::eR8G8B8A8Unorm, vk::ImageLayout::ePreinitialized, vk::ImageLayout::eTransferDstOptimal);

@@ -24,12 +24,15 @@ namespace helper
         void update (helper::Renderer *renderer);
         helper::UniformBufferObject getUniformBufferObject ();
 
+        void handleKeypress (int key, int action, int mods);
+
     private:
         helper::UniformBufferObject ubo;
 
         glm::vec3 cameraPosition;
-        glm::vec3 cameraFront;
+        glm::vec3 cameraDirection;
         glm::vec3 cameraUp;
+        float speed;
     };
 
 }

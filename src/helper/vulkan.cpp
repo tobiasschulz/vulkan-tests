@@ -5,21 +5,23 @@
 #include "vulkan.h"
 
 #define STB_IMAGE_IMPLEMENTATION
+
 #include "../../3rdparty/stb/stb_image.h"
 
 VkResult __vkCreateDebugReportCallbackEXT (VkInstance instance, const VkDebugReportCallbackCreateInfoEXT *pCreateInfo,
-                                       const VkAllocationCallbacks *pAllocator, VkDebugReportCallbackEXT *pCallback)
+                                           const VkAllocationCallbacks *pAllocator, VkDebugReportCallbackEXT *pCallback)
 {
     auto func = (PFN_vkCreateDebugReportCallbackEXT) vkGetInstanceProcAddr (instance, "vkCreateDebugReportCallbackEXT");
     if (func != nullptr) {
         return func (instance, pCreateInfo, pAllocator, pCallback);
-    } else {
+    }
+    else {
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 }
 
 void __vkDestroyDebugReportCallbackEXT (VkInstance instance, VkDebugReportCallbackEXT callback,
-                                    const VkAllocationCallbacks *pAllocator)
+                                        const VkAllocationCallbacks *pAllocator)
 {
     auto func = (PFN_vkDestroyDebugReportCallbackEXT) vkGetInstanceProcAddr (instance,
                                                                              "vkDestroyDebugReportCallbackEXT");

@@ -48,8 +48,8 @@ namespace helper
                     vk::BufferUsageFlags (vk::BufferUsageFlagBits::eTransferDst) | vk::BufferUsageFlagBits::eVertexBuffer,
                     vk::MemoryPropertyFlagBits::eDeviceLocal
             );
-            vertexBuffer = vk::UniqueBuffer( _vertexBuffer);
-            vertexBufferMemory = vk::UniqueDeviceMemory( _vertexBufferMemory);
+            vertexBuffer = vk::UniqueBuffer (_vertexBuffer);
+            vertexBufferMemory = vk::UniqueDeviceMemory (_vertexBufferMemory);
 
             helper::BufferHelper::copyBuffer (renderer, stagingBuffer, *vertexBuffer, bufferSize);
         }
@@ -79,8 +79,8 @@ namespace helper
                     vk::BufferUsageFlags (vk::BufferUsageFlagBits::eTransferDst) | vk::BufferUsageFlagBits::eIndexBuffer,
                     vk::MemoryPropertyFlagBits::eDeviceLocal
             );
-            indexBuffer = vk::UniqueBuffer(_indexBuffer);
-            indexBufferMemory = vk::UniqueDeviceMemory(_indexBufferMemory);
+            indexBuffer = vk::UniqueBuffer (_indexBuffer);
+            indexBufferMemory = vk::UniqueDeviceMemory (_indexBufferMemory);
 
             helper::BufferHelper::copyBuffer (renderer, stagingBuffer, *indexBuffer, bufferSize);
         }

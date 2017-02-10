@@ -11,7 +11,7 @@ namespace helper
 
     SwapChainSupport SwapChainSupport::querySwapChainSupport (vk::SurfaceKHR surface, vk::PhysicalDevice physicalDevice)
     {
-        return SwapChainSupport(surface, physicalDevice);
+        return SwapChainSupport (surface, physicalDevice);
     }
 
     SwapChainSupport::SwapChainSupport (vk::SurfaceKHR surface, vk::PhysicalDevice physicalDevice)
@@ -51,7 +51,8 @@ namespace helper
     {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max ()) {
             return capabilities.currentExtent;
-        } else {
+        }
+        else {
             vk::Extent2D actualExtent = { width, height };
 
             actualExtent.width = std::max (capabilities.minImageExtent.width,
