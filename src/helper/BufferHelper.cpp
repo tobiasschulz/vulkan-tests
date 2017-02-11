@@ -8,6 +8,15 @@ namespace helper
 {
 
 
+    std::pair<vk::UniqueBuffer, vk::UniqueDeviceMemory>
+    BufferHelper::createBufferUnique (helper::Renderer &renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
+    {
+        vk::Buffer _indexBuffer;
+        vk::DeviceMemory _indexBufferMemory;
+        std::tie (_indexBuffer, _indexBufferMemory) = createBuffer (renderer, size, usage, properties);
+        return std::make_pair (vk::UniqueBuffer (_indexBuffer), vk::UniqueDeviceMemory (_indexBufferMemory));
+    }
+
     std::pair<vk::Buffer, vk::DeviceMemory> BufferHelper::createBuffer (helper::Renderer &renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
     {
         vk::Device device = renderer.getDevice ();

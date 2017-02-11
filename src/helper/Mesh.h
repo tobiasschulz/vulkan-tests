@@ -10,6 +10,7 @@
 #include "Renderer.h"
 #include "Vertex.h"
 #include "BufferHelper.h"
+#include "Camera.h"
 
 namespace helper
 {
@@ -18,6 +19,9 @@ namespace helper
     {
     public:
         Mesh (helper::Renderer &renderer);
+
+        void create ();
+        void update (helper::Camera* camera);
 
         vk::Buffer getVertexBuffer ();
         uint32_t getVertexCount ();

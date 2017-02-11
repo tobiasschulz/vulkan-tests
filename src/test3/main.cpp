@@ -123,6 +123,11 @@ private:
 
             camera.update (this);
             uniformBuffer.update (this, camera.getUniformBufferObject ());
+            for (uint32_t m = 0; m < meshes.size (); m++) {
+                auto &mesh = meshes[m];
+                mesh->update(&camera);
+            }
+            createCommandBuffers ();
 
             drawFrame ();
         }
@@ -496,8 +501,8 @@ private:
 
     void createMeshes ()
     {
-
         std::shared_ptr<helper::Mesh> mesh1 = std::make_shared<helper::Mesh> (*this);
+        mesh1->create();
         meshes.push_back (mesh1);
     }
 
