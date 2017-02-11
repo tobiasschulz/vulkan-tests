@@ -6,9 +6,9 @@
 #define VULKANTEST_RENDERER_H
 
 #include "vulkan.h"
-#include "../../3rdparty/glm/glm/glm.hpp"
+#include "glm/glm.hpp"
 
-namespace helper
+namespace vulkan
 {
 
     class Renderer

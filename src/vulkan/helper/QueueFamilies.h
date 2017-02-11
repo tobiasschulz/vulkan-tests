@@ -5,7 +5,7 @@
 #ifndef VULKANTEST_QUEUEFAMILIES_H
 #define VULKANTEST_QUEUEFAMILIES_H
 
-#include "../helper/vulkan.h"
+#include "../vulkan.h"
 
 namespace helper
 {

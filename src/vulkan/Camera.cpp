@@ -4,7 +4,7 @@
 
 #include "Camera.h"
 
-namespace helper
+namespace vulkan
 {
 
     Camera::Camera ()
@@ -21,7 +21,7 @@ namespace helper
         return ubo;
     }
 
-    void Camera::update (helper::Renderer *renderer)
+    void Camera::update (vulkan::Renderer *renderer)
     {
         static auto startTime = std::chrono::high_resolution_clock::now ();
 

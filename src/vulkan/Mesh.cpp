@@ -4,7 +4,7 @@
 
 #include "Mesh.h"
 
-namespace helper
+namespace vulkan
 {
     const std::vector<helper::Vertex> vertices = {
             {{ -1.0f,  0.1f, -1.0f },  { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f }},
@@ -28,7 +28,7 @@ namespace helper
     };
 
 
-    Mesh::Mesh (helper::Renderer *_renderer)
+    Mesh::Mesh (vulkan::Renderer *_renderer)
             : renderer (_renderer),
               vertexBuffer(_renderer, vk::BufferUsageFlagBits::eVertexBuffer),
               indexBuffer(_renderer, vk::BufferUsageFlagBits::eIndexBuffer)
@@ -49,7 +49,7 @@ namespace helper
         );
     }
 
-    void Mesh::update (helper::Camera *camera)
+    void Mesh::update (vulkan::Camera *camera)
     {
     }
 

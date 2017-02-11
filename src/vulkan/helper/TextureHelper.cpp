@@ -9,7 +9,7 @@ namespace helper
 
 
     std::pair<vk::Image, vk::DeviceMemory>
-    TextureHelper::createImage (helper::Renderer &renderer, uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties)
+    TextureHelper::createImage (vulkan::Renderer &renderer, uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties)
     {
         vk::Device device = renderer.getDevice ();
 
@@ -42,7 +42,7 @@ namespace helper
     }
 
 
-    void TextureHelper::transitionImageLayout (helper::Renderer &renderer, vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout)
+    void TextureHelper::transitionImageLayout (vulkan::Renderer &renderer, vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout)
     {
         vk::CommandBuffer commandBuffer = renderer.beginSingleTimeCommands ();
 
@@ -87,7 +87,7 @@ namespace helper
     }
 
 
-    void TextureHelper::copyImage (helper::Renderer &renderer, vk::Image srcImage, vk::Image dstImage, uint32_t width, uint32_t height)
+    void TextureHelper::copyImage (vulkan::Renderer &renderer, vk::Image srcImage, vk::Image dstImage, uint32_t width, uint32_t height)
     {
         vk::CommandBuffer commandBuffer = renderer.beginSingleTimeCommands ();
 

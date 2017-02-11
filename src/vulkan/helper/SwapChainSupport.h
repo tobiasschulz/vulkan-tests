@@ -5,7 +5,7 @@
 #ifndef VULKANTEST_SWAPCHAINSUPPORTHELPER_H
 #define VULKANTEST_SWAPCHAINSUPPORTHELPER_H
 
-#include "../helper/vulkan.h"
+#include "../vulkan.h"
 
 namespace helper
 {

@@ -9,7 +9,7 @@ namespace helper
 
 
     std::pair<std::shared_ptr<vk::UniqueBuffer>, std::shared_ptr<vk::UniqueDeviceMemory>>
-    BufferHelper::createBufferShared (helper::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
+    BufferHelper::createBufferShared (vulkan::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
     {
         vk::Buffer _indexBuffer;
         vk::DeviceMemory _indexBufferMemory;
@@ -18,7 +18,7 @@ namespace helper
     }
 
     std::pair<vk::UniqueBuffer, vk::UniqueDeviceMemory>
-    BufferHelper::createBufferUnique (helper::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
+    BufferHelper::createBufferUnique (vulkan::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
     {
         vk::Buffer _indexBuffer;
         vk::DeviceMemory _indexBufferMemory;
@@ -26,7 +26,7 @@ namespace helper
         return std::make_pair (vk::UniqueBuffer (_indexBuffer), vk::UniqueDeviceMemory (_indexBufferMemory));
     }
 
-    std::pair<vk::Buffer, vk::DeviceMemory> BufferHelper::createBuffer (helper::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
+    std::pair<vk::Buffer, vk::DeviceMemory> BufferHelper::createBuffer (vulkan::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
     {
         vk::Device device = renderer->getDevice ();
 
@@ -49,7 +49,7 @@ namespace helper
         return std::make_pair (buffer, bufferMemory);
     }
 
-    void BufferHelper::copyBuffer (Renderer *renderer, vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size)
+    void BufferHelper::copyBuffer (vulkan::Renderer *renderer, vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size)
     {
         vk::CommandBuffer commandBuffer = renderer->beginSingleTimeCommands ();
 

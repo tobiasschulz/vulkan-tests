@@ -5,7 +5,7 @@
 #include "Renderer.h"
 
 
-namespace helper
+namespace vulkan
 {
 
     vk::Device Renderer::getDevice ()

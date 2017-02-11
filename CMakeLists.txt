@@ -48,40 +48,40 @@ endif (UNIX)
 
 
 set(SOURCE_COMMON
-        src/helper/io.cpp
-        src/helper/io.h
+        src/vulkan/helper/io.cpp
+        src/vulkan/helper/io.h
         3rdparty/backward/backward.cpp
         3rdparty/backward/backward.hpp
-        src/helper/helpers.cpp
-        src/helper/helpers.h
-        src/helper/SwapChainSupport.cpp
-        src/helper/SwapChainSupport.h
-        src/helper/QueueFamilies.cpp
-        src/helper/QueueFamilies.h
-        src/helper/Shader.cpp
-        src/helper/Shader.h
-        src/helper/vulkan.cpp
-        src/helper/vulkan.h
-        src/helper/Vertex.cpp
-        src/helper/Vertex.h
-        src/helper/Texture.cpp
-        src/helper/Texture.h
-        src/helper/Mesh.cpp
-        src/helper/Mesh.h
-        src/helper/Renderer.cpp
-        src/helper/Renderer.h
-        src/helper/TextureHelper.cpp
-        src/helper/TextureHelper.h
-        src/helper/BufferHelper.cpp
-        src/helper/BufferHelper.h
-        src/helper/UniformBuffer.cpp
-        src/helper/UniformBuffer.h
-        src/helper/UniformBufferObject.cpp
-        src/helper/UniformBufferObject.h
-        src/helper/Camera.cpp
-        src/helper/Camera.h
-        src/helper/Buffer.cpp
-        src/helper/Buffer.h
+        src/vulkan/helper/helpers.cpp
+        src/vulkan/helper/helpers.h
+        src/vulkan/helper/SwapChainSupport.cpp
+        src/vulkan/helper/SwapChainSupport.h
+        src/vulkan/helper/QueueFamilies.cpp
+        src/vulkan/helper/QueueFamilies.h
+        src/vulkan/helper/Shader.cpp
+        src/vulkan/helper/Shader.h
+        src/vulkan/vulkan.cpp
+        src/vulkan/vulkan.h
+        src/vulkan/helper/Vertex.cpp
+        src/vulkan/helper/Vertex.h
+        src/vulkan/helper/Texture.cpp
+        src/vulkan/helper/Texture.h
+        src/vulkan/Mesh.cpp
+        src/vulkan/Mesh.h
+        src/vulkan/Renderer.cpp
+        src/vulkan/Renderer.h
+        src/vulkan/helper/TextureHelper.cpp
+        src/vulkan/helper/TextureHelper.h
+        src/vulkan/helper/BufferHelper.cpp
+        src/vulkan/helper/BufferHelper.h
+        src/vulkan/helper/UniformBuffer.cpp
+        src/vulkan/helper/UniformBuffer.h
+        src/vulkan/helper/UniformBufferObject.cpp
+        src/vulkan/helper/UniformBufferObject.h
+        src/vulkan/Camera.cpp
+        src/vulkan/Camera.h
+        src/vulkan/Buffer.cpp
+        src/vulkan/Buffer.h
         )
 
 # TEST 1

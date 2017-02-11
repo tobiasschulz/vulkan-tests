@@ -1,6 +1,6 @@
 #include "main.h"
 
-#include "../helper/vulkan.h"
+#include "../vulkan/vulkan.h"
 #include "../helper/io.h"
 
 #include <iostream>

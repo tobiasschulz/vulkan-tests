@@ -6,7 +6,7 @@
 
 namespace helper
 {
-    Texture::Texture (helper::Renderer &_renderer, std::string _filename)
+    Texture::Texture (vulkan::Renderer &_renderer, std::string _filename)
             : filename (_filename), renderer (_renderer)
     {
         // create image

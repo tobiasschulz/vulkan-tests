@@ -11,7 +11,7 @@ namespace helper
     {
     }
 
-    void UniformBuffer::create (helper::Renderer *renderer)
+    void UniformBuffer::create (vulkan::Renderer *renderer)
     {
         if (renderer == nullptr) return;
 
@@ -43,7 +43,7 @@ namespace helper
 
     }
 
-    void UniformBuffer::update (helper::Renderer *renderer, helper::UniformBufferObject ubo)
+    void UniformBuffer::update (vulkan::Renderer *renderer, helper::UniformBufferObject ubo)
     {
         if (renderer == nullptr) return;
         auto device = renderer->getDevice ();

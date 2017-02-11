@@ -1,8 +1,8 @@
 #include "main.h"
 
-#include "../helper/vulkan.h"
-#include "../helper/io.h"
-#include "../helper/helpers.h"
+#include "../vulkan/vulkan.h"
+#include "../vulkan/helper/io.h"
+#include "../vulkan/helper/helpers.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -29,7 +29,7 @@ bool enableValidationLayers = false;
 bool enableValidationLayers = true;
 #endif
 
-class HelloTriangleApplication : public helper::Renderer
+class HelloTriangleApplication : public vulkan::Renderer
 {
 public:
     HelloTriangleApplication ()
@@ -64,9 +64,9 @@ private:
     std::vector<vk::UniqueCommandBuffer> commandBuffers;
 
     std::vector<std::shared_ptr<helper::Texture>> textures;
-    std::vector<std::shared_ptr<helper::Mesh>> meshes;
+    std::vector<std::shared_ptr<vulkan::Mesh>> meshes;
     helper::UniformBuffer uniformBuffer;
-    helper::Camera camera;
+    vulkan::Camera camera;
 
     vk::UniqueDescriptorPool descriptorPool;
     vk::UniqueDescriptorSet descriptorSet;
@@ -501,7 +501,7 @@ private:
 
     void createMeshes ()
     {
-        std::shared_ptr<helper::Mesh> mesh1 = std::make_shared<helper::Mesh> (this);
+        std::shared_ptr<vulkan::Mesh> mesh1 = std::make_shared<vulkan::Mesh> (this);
         mesh1->create();
         meshes.push_back (mesh1);
     }

@@ -6,23 +6,23 @@
 #define VULKANTEST_MESH_H
 
 #include "vulkan.h"
-#include "../../3rdparty/glm/glm/glm.hpp"
+#include "glm/glm.hpp"
 #include "Renderer.h"
-#include "Vertex.h"
-#include "BufferHelper.h"
+#include "helper/Vertex.h"
+#include "helper/BufferHelper.h"
 #include "Camera.h"
 #include "Buffer.h"
 
-namespace helper
+namespace vulkan
 {
 
     class Mesh
     {
     public:
-        Mesh (helper::Renderer *renderer);
+        Mesh (vulkan::Renderer *renderer);
 
         void create ();
-        void update (helper::Camera* camera);
+        void update (vulkan::Camera* camera);
 
         vk::Buffer getVertexBuffer ();
         uint32_t getVertexCount ();
@@ -30,10 +30,10 @@ namespace helper
         uint32_t getIndexCount ();
 
     private:
-        helper::Renderer *renderer;
+        vulkan::Renderer *renderer;
 
-        helper::Buffer vertexBuffer;
-        helper::Buffer indexBuffer;
+        vulkan::Buffer vertexBuffer;
+        vulkan::Buffer indexBuffer;
 
     };
 

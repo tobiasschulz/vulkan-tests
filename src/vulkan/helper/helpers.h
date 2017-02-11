@@ -5,7 +5,7 @@
 #ifndef VULKANTEST_VULKANHELPER_H
 #define VULKANTEST_VULKANHELPER_H
 
-#include "../helper/vulkan.h"
+#include "../vulkan.h"
 #include "SwapChainSupport.h"
 #include "QueueFamilies.h"
 #include "Shader.h"
@@ -14,9 +14,10 @@
 #include "Vertex.h"
 #include "UniformBuffer.h"
 #include "UniformBufferObject.h"
-#include "Mesh.h"
-#include "Renderer.h"
 #include "BufferHelper.h"
-#include "Camera.h"
+#include "../Mesh.h"
+#include "../Camera.h"
+#include "../Renderer.h"
+
 
 #endif //VULKANTEST_VULKANHELPER_H

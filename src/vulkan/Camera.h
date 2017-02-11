@@ -7,13 +7,13 @@
 
 #include <chrono>
 #include "vulkan.h"
-#include "../../3rdparty/glm/glm/glm.hpp"
-#include "../../3rdparty/glm/glm/gtc/matrix_transform.hpp"
-#include "UniformBufferObject.h"
-#include "UniformBuffer.h"
-#include "BufferHelper.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "helper/UniformBufferObject.h"
+#include "helper/UniformBuffer.h"
+#include "helper/BufferHelper.h"
 
-namespace helper
+namespace vulkan
 {
 
     class Camera
@@ -21,7 +21,7 @@ namespace helper
     public:
         Camera ();
 
-        void update (helper::Renderer *renderer);
+        void update (vulkan::Renderer *renderer);
         helper::UniformBufferObject getUniformBufferObject ();
 
         void handleKeypress (int key, int action, int mods);
