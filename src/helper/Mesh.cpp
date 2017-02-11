@@ -37,8 +37,6 @@ namespace helper
 
     void Mesh::create ()
     {
-        vk::Device device = renderer->getDevice ();
-
         // create vertex buffer
         vertexBuffer.create (
                 sizeof (vertices[0]) * vertices.size (), // buffer size

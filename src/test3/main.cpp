@@ -501,7 +501,7 @@ private:
 
     void createMeshes ()
     {
-        std::shared_ptr<helper::Mesh> mesh1 = std::make_shared<helper::Mesh> (*this);
+        std::shared_ptr<helper::Mesh> mesh1 = std::make_shared<helper::Mesh> (this);
         mesh1->create();
         meshes.push_back (mesh1);
     }
