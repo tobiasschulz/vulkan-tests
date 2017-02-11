@@ -20,7 +20,7 @@ namespace helper
         vk::Buffer _uniformStagingBuffer;
         vk::DeviceMemory _uniformStagingBufferMemory;
         std::tie (_uniformStagingBuffer, _uniformStagingBufferMemory) = helper::BufferHelper::createBuffer (
-                *renderer,
+                renderer,
                 bufferSize,
                 vk::BufferUsageFlagBits::eTransferSrc,
                 vk::MemoryPropertyFlags (vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlagBits::eHostCoherent
@@ -32,7 +32,7 @@ namespace helper
         vk::Buffer _uniformBuffer;
         vk::DeviceMemory _uniformBufferMemory;
         std::tie (_uniformBuffer, _uniformBufferMemory) = helper::BufferHelper::createBuffer (
-                *renderer,
+                renderer,
                 bufferSize,
                 vk::BufferUsageFlags (vk::BufferUsageFlagBits::eTransferDst) | vk::BufferUsageFlagBits::eUniformBuffer,
                 vk::MemoryPropertyFlagBits::eDeviceLocal
@@ -52,7 +52,7 @@ namespace helper
         memcpy (data, &ubo, sizeof (ubo));
         device.unmapMemory (*uniformStagingBufferMemory);
 
-        helper::BufferHelper::copyBuffer (*renderer, *uniformStagingBuffer, *uniformBuffer, sizeof (ubo));
+        helper::BufferHelper::copyBuffer (renderer, *uniformStagingBuffer, *uniformBuffer, sizeof (ubo));
     }
 
 }

@@ -11,6 +11,7 @@
 #include "Vertex.h"
 #include "BufferHelper.h"
 #include "Camera.h"
+#include "Buffer.h"
 
 namespace helper
 {
@@ -18,7 +19,7 @@ namespace helper
     class Mesh
     {
     public:
-        Mesh (helper::Renderer &renderer);
+        Mesh (helper::Renderer *renderer);
 
         void create ();
         void update (helper::Camera* camera);
@@ -29,12 +30,10 @@ namespace helper
         uint32_t getIndexCount ();
 
     private:
-        helper::Renderer &renderer;
+        helper::Renderer *renderer;
 
-        vk::UniqueBuffer vertexBuffer;
-        vk::UniqueDeviceMemory vertexBufferMemory;
-        vk::UniqueBuffer indexBuffer;
-        vk::UniqueDeviceMemory indexBufferMemory;
+        helper::Buffer vertexBuffer;
+        helper::Buffer indexBuffer;
 
     };
 

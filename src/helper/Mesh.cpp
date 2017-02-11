@@ -28,69 +28,27 @@ namespace helper
     };
 
 
-    Mesh::Mesh (helper::Renderer &_renderer)
-            : renderer (_renderer)
+    Mesh::Mesh (helper::Renderer *_renderer)
+            : renderer (_renderer),
+              vertexBuffer(_renderer, vk::BufferUsageFlagBits::eVertexBuffer),
+              indexBuffer(_renderer, vk::BufferUsageFlagBits::eIndexBuffer)
     {
-
     }
 
     void Mesh::create ()
     {
-        vk::Device device = renderer.getDevice ();
+        vk::Device device = renderer->getDevice ();
 
         // create vertex buffer
-        {
-            VkDeviceSize bufferSize = sizeof (vertices[0]) * vertices.size ();
-
-            vk::Buffer stagingBuffer;
-            vk::DeviceMemory stagingBufferMemory;
-            std::tie (stagingBuffer, stagingBufferMemory) = helper::BufferHelper::createBuffer (
-                    renderer,
-                    bufferSize,
-                    vk::BufferUsageFlagBits::eTransferSrc,
-                    vk::MemoryPropertyFlags (vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlagBits::eHostCoherent
-            );
-
-            void *data = device.mapMemory (stagingBufferMemory, 0, bufferSize);
-            memcpy (data, vertices.data (), (size_t) bufferSize);
-            device.unmapMemory (stagingBufferMemory);
-
-            std::tie (vertexBuffer, vertexBufferMemory) = helper::BufferHelper::createBufferUnique (
-                    renderer,
-                    bufferSize,
-                    vk::BufferUsageFlags (vk::BufferUsageFlagBits::eTransferDst) | vk::BufferUsageFlagBits::eVertexBuffer,
-                    vk::MemoryPropertyFlagBits::eDeviceLocal
-            );
-
-            helper::BufferHelper::copyBuffer (renderer, stagingBuffer, *vertexBuffer, bufferSize);
-        }
-
-        // create index buffer
-        {
-            vk::DeviceSize bufferSize = sizeof (indices[0]) * indices.size ();
-
-            vk::Buffer stagingBuffer;
-            vk::DeviceMemory stagingBufferMemory;
-            std::tie (stagingBuffer, stagingBufferMemory) = helper::BufferHelper::createBuffer (
-                    renderer,
-                    bufferSize,
-                    vk::BufferUsageFlagBits::eTransferSrc,
-                    vk::MemoryPropertyFlags (vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlagBits::eHostCoherent
-            );
-
-            void *data = device.mapMemory (stagingBufferMemory, 0, bufferSize);
-            memcpy (data, indices.data (), (size_t) bufferSize);
-            device.unmapMemory (stagingBufferMemory);
-
-            std::tie (indexBuffer, indexBufferMemory) = helper::BufferHelper::createBufferUnique (
-                    renderer,
-                    bufferSize,
-                    vk::BufferUsageFlags (vk::BufferUsageFlagBits::eTransferDst) | vk::BufferUsageFlagBits::eIndexBuffer,
-                    vk::MemoryPropertyFlagBits::eDeviceLocal
-            );
-
-            helper::BufferHelper::copyBuffer (renderer, stagingBuffer, *indexBuffer, bufferSize);
-        }
+        vertexBuffer.create (
+                sizeof (vertices[0]) * vertices.size (), // buffer size
+                vertices.data()
+        );
+        // create vertex buffer
+        indexBuffer.create (
+                sizeof (indices[0]) * indices.size (), // buffer size
+                indices.data()
+        );
     }
 
     void Mesh::update (helper::Camera *camera)
@@ -99,12 +57,12 @@ namespace helper
 
     vk::Buffer Mesh::getVertexBuffer ()
     {
-        return *vertexBuffer;
+        return vertexBuffer.getBuffer ();
     }
 
     vk::Buffer Mesh::getIndexBuffer ()
     {
-        return *indexBuffer;
+        return indexBuffer.getBuffer ();
     }
 
     uint32_t Mesh::getVertexCount ()

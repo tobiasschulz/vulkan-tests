@@ -17,9 +17,9 @@ namespace helper
     class BufferHelper
     {
     public:
-        static std::pair<vk::Buffer, vk::DeviceMemory> createBuffer (helper::Renderer &renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties);
-        static std::pair<vk::UniqueBuffer, vk::UniqueDeviceMemory> createBufferUnique (helper::Renderer &renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties);
-        static void copyBuffer (Renderer &renderer, vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size);
+        static std::pair<vk::Buffer, vk::DeviceMemory> createBuffer (helper::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties);
+        static std::pair<vk::UniqueBuffer, vk::UniqueDeviceMemory> createBufferUnique (helper::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties);
+        static void copyBuffer (Renderer *renderer, vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size);
     };
 
 }
