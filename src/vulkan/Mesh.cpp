@@ -51,6 +51,16 @@ namespace vulkan
 
     void Mesh::update (vulkan::Camera *camera)
     {
+        // update vertex buffer
+        vertexBuffer.update (
+                sizeof (vertices[0]) * vertices.size (), // buffer size
+                vertices.data()
+        );
+        // update vertex buffer
+        indexBuffer.update (
+                sizeof (indices[0]) * indices.size (), // buffer size
+                indices.data()
+        );
     }
 
     vk::Buffer Mesh::getVertexBuffer ()

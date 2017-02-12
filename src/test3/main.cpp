@@ -16,23 +16,17 @@
 const int WIDTH = 800;
 const int HEIGHT = 600;
 
-const std::vector<const char *> VALIDATION_LAYERS = {
-        "VK_LAYER_LUNARG_standard_validation",
-        // "VK_LAYER_LUNARG_api_dump",
-};
-
-const std::vector<const char *> REQUIRED_EXTENSIONS = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, };
-
 #ifdef NDEBUG
-bool enableValidationLayers = false;
+bool ENABLE_VALIDATION_LAYERS = false;
 #else
-bool enableValidationLayers = true;
+bool ENABLE_VALIDATION_LAYERS = true;
 #endif
 
 class HelloTriangleApplication : public vulkan::Renderer
 {
 public:
     HelloTriangleApplication ()
+            : Renderer (ENABLE_VALIDATION_LAYERS)
     {
     }
 
@@ -44,19 +38,6 @@ public:
     }
 
 private:
-    GLFWwindow *window;
-
-    vk::UniqueDebugReportCallbackEXT callback;
-    vk::SurfaceKHR surface;
-
-    vk::UniqueSwapchainKHR swapChain;
-
-    std::vector<vk::Image> swapChainImages;
-    vk::Format swapChainImageFormat;
-    std::vector<vk::UniqueImageView> swapChainImageViews;
-    std::vector<vk::UniqueFramebuffer> swapChainFramebuffers;
-
-    vk::UniqueRenderPass renderPass;
     vk::UniqueDescriptorSetLayout descriptorSetLayout;
     vk::UniquePipelineLayout pipelineLayout;
     vk::UniquePipeline graphicsPipeline;
@@ -74,38 +55,32 @@ private:
     vk::Semaphore imageAvailableSemaphore;
     vk::Semaphore renderFinishedSemaphore;
 
-    vk::UniqueInstance instance;
 
     void initWindow ()
     {
-        glfwInit ();
+        window->create (WIDTH, HEIGHT);
 
-        glfwWindowHint (GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint (GLFW_RESIZABLE, GLFW_FALSE);
-
-        window = glfwCreateWindow (WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-
-        glfwSetWindowUserPointer (window, this);
-        glfwSetKeyCallback (window, [] (GLFWwindow *window, int key, int scancode, int action, int mods) {
+        glfwSetWindowUserPointer (window->getNativeWindow (), this);
+        glfwSetKeyCallback (window->getNativeWindow (), [] (GLFWwindow *w, int key, int scancode, int action, int mods) {
             // Here we retrieve the pointer we setted before. It will be equal to `this`
-            auto &that = *static_cast<HelloTriangleApplication *>(glfwGetWindowUserPointer (window));
-            that.handleKeypress (window, key, scancode, action, mods);
+            auto &that = *static_cast<HelloTriangleApplication *>(glfwGetWindowUserPointer (w));
+            that.handleKeypress (w, key, scancode, action, mods);
         });
     }
 
     void initVulkan ()
     {
-        createInstance ();
-        setupDebugCallback ();
-        createSurface ();
-        pickPhysicalDevice ();
-        createLogicalDevice ();
-        createSwapChain ();
-        createImageViews ();
-        createRenderPass ();
+        vk::ApplicationInfo appInfo (
+                "Hello Triangle 3",
+                VK_MAKE_VERSION(1, 0, 0),
+                "No Engine",
+                VK_MAKE_VERSION(1, 0, 0),
+                VK_API_VERSION_1_0
+        );
+
+        createSurface (appInfo, WIDTH, HEIGHT);
         createDescriptorSetLayout ();
         createGraphicsPipeline ();
-        createFramebuffers ();
         createCommandPool ();
         createTextures ();
         createMeshes ();
@@ -118,228 +93,33 @@ private:
 
     void mainLoop ()
     {
-        while (!glfwWindowShouldClose (window)) {
+        while (!glfwWindowShouldClose (window->getNativeWindow ())) {
             glfwPollEvents ();
 
             camera.update (this);
             uniformBuffer.update (this, camera.getUniformBufferObject ());
             for (uint32_t m = 0; m < meshes.size (); m++) {
                 auto &mesh = meshes[m];
-                mesh->update(&camera);
+                mesh->update (&camera);
             }
             createCommandBuffers ();
 
             drawFrame ();
         }
 
-        device->waitIdle ();
+        surface->getDevice ().waitIdle ();
 
-        glfwDestroyWindow (window);
+        glfwDestroyWindow (window->getNativeWindow ());
     }
 
-    void createInstance ()
-    {
-        if (enableValidationLayers && !checkValidationLayerSupport ()) {
-            throw std::runtime_error ("validation layers requested, but not available!");
-        }
-
-        vk::ApplicationInfo appInfo (
-                "Hello Triangle 2",
-                VK_MAKE_VERSION(1, 0, 0),
-                "No Engine",
-                VK_MAKE_VERSION(1, 0, 0),
-                VK_API_VERSION_1_0
-        );
-        vk::InstanceCreateInfo createInfo ({}, &appInfo);
-
-        auto extensions = getRequiredExtensions ();
-        createInfo.setEnabledExtensionCount ((uint32_t) extensions.size ());
-        createInfo.setPpEnabledExtensionNames (extensions.data ());
-
-        if (enableValidationLayers) {
-            createInfo.enabledLayerCount = (uint32_t) VALIDATION_LAYERS.size ();
-            createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data ();
-        }
-        else {
-            createInfo.enabledLayerCount = 0;
-        }
-
-        instance = vk::createInstanceUnique (createInfo);
-    }
-
-    void setupDebugCallback ()
-    {
-        if (!enableValidationLayers)
-            return;
-
-        vk::DebugReportCallbackCreateInfoEXT createInfo (vk::DebugReportFlagBitsEXT::eDebug, debugCallback);
-        callback = instance->createDebugReportCallbackEXTUnique (createInfo);
-    }
-
-    void handleKeypress (GLFWwindow *window, int key, int scancode, int action, int mods)
+    void handleKeypress (GLFWwindow *w, int key, int scancode, int action, int mods)
     {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-            glfwSetWindowShouldClose (window, GL_TRUE);
+            glfwSetWindowShouldClose (w, GL_TRUE);
         }
         else {
             camera.handleKeypress (key, action, mods);
         }
-    }
-
-    void createSurface ()
-    {
-        VkSurfaceKHR result;
-        if (glfwCreateWindowSurface (((VkInstance) instance.get ()), window, nullptr, &result) != VK_SUCCESS) {
-            throw std::runtime_error ("failed to create window surface!");
-        }
-        surface = vk::SurfaceKHR (result);
-    }
-
-    void pickPhysicalDevice ()
-    {
-        auto physicalDevices = instance->enumeratePhysicalDevices ();
-        for (const auto &pd : physicalDevices) {
-            if (helper::SwapChainSupport::isDeviceSuitable (surface, pd, REQUIRED_EXTENSIONS)) {
-                physicalDevice = pd;
-                break;
-            }
-        }
-
-        if (!physicalDevice) {
-            throw std::runtime_error ("failed to find a suitable GPU!");
-        }
-    }
-
-    void createLogicalDevice ()
-    {
-        helper::QueueFamilies indices = helper::QueueFamilies::findQueueFamilies (surface, physicalDevice);
-
-        std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
-        std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
-
-        for (int queueFamily : uniqueQueueFamilies) {
-            float queuePriority = 1.0f;
-            queueCreateInfos.push_back (vk::DeviceQueueCreateInfo ({}, queueFamily, 1, &queuePriority));
-        }
-
-        vk::DeviceCreateInfo createInfo;
-
-        createInfo.queueCreateInfoCount = (uint32_t) queueCreateInfos.size ();
-        createInfo.pQueueCreateInfos = queueCreateInfos.data ();
-
-        createInfo.enabledExtensionCount = (uint32_t) REQUIRED_EXTENSIONS.size ();
-        createInfo.ppEnabledExtensionNames = REQUIRED_EXTENSIONS.data ();
-
-        if (enableValidationLayers) {
-            createInfo.enabledLayerCount = (uint32_t) VALIDATION_LAYERS.size ();
-            createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data ();
-        }
-        else {
-            createInfo.enabledLayerCount = 0;
-        }
-
-        device = physicalDevice.createDeviceUnique (createInfo);
-
-        device->getQueue ((uint32_t) indices.graphicsFamily, 0, &graphicsQueue);
-        device->getQueue ((uint32_t) indices.presentFamily, 0, &presentQueue);
-    }
-
-    void createSwapChain ()
-    {
-        helper::SwapChainSupport s = helper::SwapChainSupport::querySwapChainSupport (surface, physicalDevice);
-
-        vk::SurfaceFormatKHR surfaceFormat = s.chooseSwapSurfaceFormat ();
-        vk::PresentModeKHR presentMode = s.chooseSwapPresentMode ();
-        vk::Extent2D extent = s.chooseSwapExtent (WIDTH, HEIGHT);
-
-        vk::SwapchainCreateInfoKHR createInfo ({}, surface);
-
-        createInfo.minImageCount = s.getImageCount ();
-        createInfo.imageFormat = surfaceFormat.format;
-        createInfo.imageColorSpace = surfaceFormat.colorSpace;
-        createInfo.imageExtent = extent;
-        createInfo.imageArrayLayers = 1;
-        createInfo.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
-
-        helper::QueueFamilies families = helper::QueueFamilies::findQueueFamilies (surface, physicalDevice);
-        families.apply (createInfo);
-
-        createInfo.preTransform = s.capabilities.currentTransform;
-        createInfo.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
-        createInfo.presentMode = presentMode;
-        createInfo.clipped = VK_TRUE;
-
-        createInfo.oldSwapchain = VK_NULL_HANDLE;
-
-        swapChain = device->createSwapchainKHRUnique (createInfo);
-
-        swapChainImages = device->getSwapchainImagesKHR (*swapChain);
-
-        swapChainImageFormat = surfaceFormat.format;
-        swapChainExtent = extent;
-    }
-
-    void createImageViews ()
-    {
-        swapChainImageViews.clear ();
-
-        for (uint32_t i = 0; i < swapChainImages.size (); i++) {
-            vk::ImageViewCreateInfo createInfo;
-            createInfo.image = swapChainImages[i];
-            createInfo.viewType = vk::ImageViewType::e2D;
-            createInfo.format = swapChainImageFormat;
-            createInfo.components.r = vk::ComponentSwizzle::eIdentity;
-            createInfo.components.g = vk::ComponentSwizzle::eIdentity;
-            createInfo.components.b = vk::ComponentSwizzle::eIdentity;
-            createInfo.components.a = vk::ComponentSwizzle::eIdentity;
-            createInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-            createInfo.subresourceRange.baseMipLevel = 0;
-            createInfo.subresourceRange.levelCount = 1;
-            createInfo.subresourceRange.baseArrayLayer = 0;
-            createInfo.subresourceRange.layerCount = 1;
-
-            swapChainImageViews.push_back (device->createImageViewUnique (createInfo));
-        }
-    }
-
-    void createRenderPass ()
-    {
-        vk::AttachmentDescription colorAttachment;
-        colorAttachment.format = swapChainImageFormat;
-        colorAttachment.samples = vk::SampleCountFlagBits::e1;
-        colorAttachment.loadOp = vk::AttachmentLoadOp::eClear;
-        colorAttachment.storeOp = vk::AttachmentStoreOp::eStore;
-        colorAttachment.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
-        colorAttachment.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
-        colorAttachment.initialLayout = vk::ImageLayout::eUndefined;
-        colorAttachment.finalLayout = vk::ImageLayout::ePresentSrcKHR;
-
-        vk::AttachmentReference colorAttachmentRef;
-        colorAttachmentRef.attachment = 0;
-        colorAttachmentRef.layout = vk::ImageLayout::eColorAttachmentOptimal;
-
-        vk::SubpassDescription subpass;
-        subpass.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
-        subpass.colorAttachmentCount = 1;
-        subpass.pColorAttachments = &colorAttachmentRef;
-
-        vk::SubpassDependency dependency;
-        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-        dependency.dstSubpass = 0;
-        dependency.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-        dependency.srcAccessMask = (vk::AccessFlagBits) 0;
-        dependency.dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-        dependency.dstAccessMask = vk::AccessFlags (vk::AccessFlagBits::eColorAttachmentRead) | vk::AccessFlagBits::eColorAttachmentWrite;
-
-        vk::RenderPassCreateInfo renderPassInfo;
-        renderPassInfo.attachmentCount = 1;
-        renderPassInfo.pAttachments = &colorAttachment;
-        renderPassInfo.subpassCount = 1;
-        renderPassInfo.pSubpasses = &subpass;
-        renderPassInfo.dependencyCount = 1;
-        renderPassInfo.pDependencies = &dependency;
-
-        renderPass = device->createRenderPassUnique (renderPassInfo);
     }
 
     void createDescriptorSetLayout ()
@@ -362,13 +142,13 @@ private:
 
         vk::DescriptorSetLayoutCreateInfo layoutInfo ({}, (uint32_t) bindings.size (), bindings.data ());
 
-        descriptorSetLayout = device->createDescriptorSetLayoutUnique (layoutInfo);
+        descriptorSetLayout = surface->getDevice ().createDescriptorSetLayoutUnique (layoutInfo);
     }
 
     void createGraphicsPipeline ()
     {
-        helper::Shader vertShader = helper::Shader::loadShader (*device, vk::ShaderStageFlagBits::eVertex, "shader3.vert.spv");
-        helper::Shader fragShader = helper::Shader::loadShader (*device, vk::ShaderStageFlagBits::eFragment, "shader3.frag.spv");
+        helper::Shader vertShader = helper::Shader::loadShader (surface->getDevice (), vk::ShaderStageFlagBits::eVertex, "shader3.vert.spv");
+        helper::Shader fragShader = helper::Shader::loadShader (surface->getDevice (), vk::ShaderStageFlagBits::eFragment, "shader3.frag.spv");
 
         vk::PipelineShaderStageCreateInfo shaderStages[] = {
                 vertShader.getPipelineShaderStageCreateInfo ("main"),
@@ -391,12 +171,12 @@ private:
         vk::Viewport viewport;
         viewport.x = 0.0f;
         viewport.y = 0.0f;
-        viewport.width = (float) swapChainExtent.width;
-        viewport.height = (float) swapChainExtent.height;
+        viewport.width = (float) surface->getSize ().width;
+        viewport.height = (float) surface->getSize ().height;
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
-        vk::Rect2D scissor (vk::Offset2D (0, 0), swapChainExtent);
+        vk::Rect2D scissor (vk::Offset2D (0, 0), surface->getSize ());
 
         vk::PipelineViewportStateCreateInfo viewportState;
         viewportState.viewportCount = 1;
@@ -438,7 +218,7 @@ private:
         vk::DescriptorSetLayout setLayouts[] = { *descriptorSetLayout };
         pipelineLayoutInfo.pSetLayouts = setLayouts;
 
-        pipelineLayout = device->createPipelineLayoutUnique (pipelineLayoutInfo);
+        pipelineLayout = surface->getDevice ().createPipelineLayoutUnique (pipelineLayoutInfo);
 
 
         vk::GraphicsPipelineCreateInfo pipelineInfo;
@@ -451,13 +231,13 @@ private:
         pipelineInfo.pMultisampleState = &multisampling;
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.layout = *pipelineLayout;
-        pipelineInfo.renderPass = *renderPass;
+        pipelineInfo.renderPass = surface->getRenderPass ();
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
         vk::PipelineCache dummyCache; // = device->createPipelineCache (vk::PipelineCacheCreateInfo (vk::PipelineCacheCreateFlags ()));
 
-        graphicsPipeline = device->createGraphicsPipelineUnique (dummyCache, pipelineInfo);
+        graphicsPipeline = surface->getDevice ().createGraphicsPipelineUnique (dummyCache, pipelineInfo);
 
         /*VkGraphicsPipelineCreateInfo i = (VkGraphicsPipelineCreateInfo) pipelineInfo;
         VkPipeline p;
@@ -468,29 +248,10 @@ private:
         graphicsPipeline = vk::UniquePipeline (vk::Pipeline (p));*/
     }
 
-    void createFramebuffers ()
-    {
-        swapChainFramebuffers.clear ();
-
-        for (size_t i = 0; i < swapChainImageViews.size (); i++) {
-            vk::ImageView attachments[] = { *swapChainImageViews[i] };
-
-            vk::FramebufferCreateInfo framebufferInfo;
-            framebufferInfo.renderPass = *renderPass;
-            framebufferInfo.attachmentCount = 1;
-            framebufferInfo.pAttachments = attachments;
-            framebufferInfo.width = swapChainExtent.width;
-            framebufferInfo.height = swapChainExtent.height;
-            framebufferInfo.layers = 1;
-
-            swapChainFramebuffers.push_back (device->createFramebufferUnique (framebufferInfo));
-        }
-    }
-
     void createCommandPool ()
     {
-        helper::QueueFamilies queueFamilies = helper::QueueFamilies::findQueueFamilies (surface, physicalDevice);
-        commandPool = device->createCommandPoolUnique (vk::CommandPoolCreateInfo ({}, queueFamilies.graphicsFamily));
+        helper::QueueFamilies queueFamilies = helper::QueueFamilies::findQueueFamilies (surface->getSurface (), surface->getPhysicalDevice ());
+        commandPool = surface->getDevice ().createCommandPoolUnique (vk::CommandPoolCreateInfo ({}, queueFamilies.graphicsFamily));
     }
 
     void createTextures ()
@@ -502,7 +263,7 @@ private:
     void createMeshes ()
     {
         std::shared_ptr<vulkan::Mesh> mesh1 = std::make_shared<vulkan::Mesh> (this);
-        mesh1->create();
+        mesh1->create ();
         meshes.push_back (mesh1);
     }
 
@@ -514,6 +275,8 @@ private:
 
     void createDescriptorPool ()
     {
+        auto device = surface->getDevice ();
+
         std::array<vk::DescriptorPoolSize, 2> poolSizes;
         poolSizes[0].type = vk::DescriptorType::eUniformBuffer;
         poolSizes[0].descriptorCount = 1;
@@ -525,11 +288,13 @@ private:
         poolInfo.pPoolSizes = poolSizes.data ();
         poolInfo.maxSets = 1;
 
-        descriptorPool = device->createDescriptorPoolUnique (poolInfo);
+        descriptorPool = device.createDescriptorPoolUnique (poolInfo);
     }
 
     void createDescriptorSet ()
     {
+        auto device = surface->getDevice ();
+
         vk::DescriptorSetLayout layouts[] = { *descriptorSetLayout };
 
         vk::DescriptorSetAllocateInfo allocInfo = {};
@@ -537,7 +302,7 @@ private:
         allocInfo.descriptorSetCount = 1;
         allocInfo.pSetLayouts = layouts;
 
-        std::vector<vk::UniqueDescriptorSet> _descriptorSets = device->allocateDescriptorSetsUnique (allocInfo); ////
+        std::vector<vk::UniqueDescriptorSet> _descriptorSets = device.allocateDescriptorSetsUnique (allocInfo); ////
         descriptorSet = std::move (_descriptorSets.front ());
 
         // descriptor writes
@@ -571,17 +336,21 @@ private:
 
         std::cout << "descriptorWrites: " << descriptorWrites.size () << std::endl;
 
-        device->updateDescriptorSets (descriptorWrites, nullptr);
+        device.updateDescriptorSets (descriptorWrites, nullptr);
     }
 
     void createCommandBuffers ()
     {
+        auto device = surface->getDevice ();
+        auto framebuffers = surface->getSwapChain ()->getFramebuffers ();
+        auto windowSize = surface->getSize ();
+
         vk::CommandBufferAllocateInfo allocInfo (
                 *commandPool,
                 vk::CommandBufferLevel::ePrimary,
-                (uint32_t) swapChainFramebuffers.size ()
+                (uint32_t) framebuffers.size ()
         );
-        commandBuffers = device->allocateCommandBuffersUnique (allocInfo);
+        commandBuffers = device.allocateCommandBuffersUnique (allocInfo);
 
         for (size_t i = 0; i < commandBuffers.size (); i++) {
             auto &cmd = commandBuffers[i];
@@ -590,10 +359,11 @@ private:
 
 
             vk::RenderPassBeginInfo renderPassInfo;
-            renderPassInfo.renderPass = *renderPass;
-            renderPassInfo.framebuffer = *swapChainFramebuffers[i];
+            auto p = surface->getRenderPass ();
+            renderPassInfo.renderPass = p;
+            renderPassInfo.framebuffer = *framebuffers[i];
             renderPassInfo.renderArea.offset = vk::Offset2D (0, 0);
-            renderPassInfo.renderArea.extent = swapChainExtent;
+            renderPassInfo.renderArea.extent = windowSize;
 
             vk::ClearValue clearColor = vk::ClearColorValue (std::array<float, 4>{{ 0.f, 0.f, 0.f, 1.f }});
             renderPassInfo.clearValueCount = 1;
@@ -627,16 +397,18 @@ private:
 
     void createSemaphores ()
     {
-        imageAvailableSemaphore = device->createSemaphore (vk::SemaphoreCreateInfo ());
-        renderFinishedSemaphore = device->createSemaphore (vk::SemaphoreCreateInfo ());
+        imageAvailableSemaphore = surface->getDevice ().createSemaphore (vk::SemaphoreCreateInfo ());
+        renderFinishedSemaphore = surface->getDevice ().createSemaphore (vk::SemaphoreCreateInfo ());
     }
 
     void drawFrame ()
     {
+        auto device = surface->getDevice ();
+
         uint32_t imageIndex;
 
-        device->acquireNextImageKHR (
-                *swapChain,
+        device.acquireNextImageKHR (
+                surface->getSwapChain ()->getSwapChain (),
                 std::numeric_limits<uint64_t>::max (), // timeout = max 64 bit value
                 imageAvailableSemaphore,
                 vk::Fence (), // empty fence (no clue what a fence is)
@@ -660,7 +432,7 @@ private:
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        graphicsQueue.submit (
+        surface->getGraphicsQueue ().submit (
                 std::vector<vk::SubmitInfo> ({ submitInfo }),
                 vk::Fence () // empty fence
         );
@@ -668,63 +440,13 @@ private:
         vk::PresentInfoKHR presentInfo;
         presentInfo.waitSemaphoreCount = 1;
         presentInfo.pWaitSemaphores = signalSemaphores;
-        const vk::SwapchainKHR pSwapchains[] = { *swapChain };
+        const vk::SwapchainKHR pSwapchains[] = { surface->getSwapChain ()->getSwapChain () };
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = pSwapchains;
 
         presentInfo.pImageIndices = &imageIndex;
 
-        presentQueue.presentKHR (presentInfo);
-    }
-
-    std::vector<const char *> getRequiredExtensions ()
-    {
-        std::vector<const char *> extensions;
-
-        unsigned int glfwExtensionCount = 0;
-        const char **glfwExtensions;
-        glfwExtensions = glfwGetRequiredInstanceExtensions (&glfwExtensionCount);
-
-        for (unsigned int i = 0; i < glfwExtensionCount; i++) {
-            extensions.push_back (glfwExtensions[i]);
-        }
-
-        if (enableValidationLayers) {
-            extensions.push_back (VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-        }
-
-        return extensions;
-    }
-
-    bool checkValidationLayerSupport ()
-    {
-        std::vector<vk::LayerProperties> availableLayers = vk::enumerateInstanceLayerProperties ();
-
-        for (const char *layerName : VALIDATION_LAYERS) {
-            bool layerFound = false;
-
-            for (const auto &layerProperties : availableLayers) {
-                if (strcmp (layerName, layerProperties.layerName) == 0) {
-                    layerFound = true;
-                    break;
-                }
-            }
-
-            if (!layerFound) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    static VKAPI_ATTR VkBool32 VKAPI_CALL
-    debugCallback (VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location,
-                   int32_t code, const char *layerPrefix, const char *msg, void *userData)
-    {
-        std::cerr << "validation layer: " << msg << std::endl;
-
-        return VK_FALSE;
+        surface->getPresentQueue ().presentKHR (presentInfo);
     }
 };
 

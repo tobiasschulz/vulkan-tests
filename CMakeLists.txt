@@ -82,6 +82,13 @@ set(SOURCE_COMMON
         src/vulkan/Camera.h
         src/vulkan/Buffer.cpp
         src/vulkan/Buffer.h
+        src/vulkan/SwapChain.cpp
+        src/vulkan/SwapChain.h
+        src/vulkan/Surface.cpp
+        src/vulkan/Surface.h
+        src/vulkan/helper/NonCopyable.h
+        src/vulkan/Window.cpp
+        src/vulkan/Window.h
         )
 
 # TEST 1

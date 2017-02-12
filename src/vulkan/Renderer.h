@@ -7,11 +7,18 @@
 
 #include "vulkan.h"
 #include "glm/glm.hpp"
+#include "SwapChain.h"
+#include "Surface.h"
+#include "Window.h"
 
 namespace vulkan
 {
 
-    class Renderer
+    class Window;
+
+    class Surface;
+
+    class Renderer : public helper::NonCopyable
     {
     public:
         uint32_t findMemoryType (uint32_t typeFilter, vk::MemoryPropertyFlags properties);
@@ -19,19 +26,25 @@ namespace vulkan
         void endSingleTimeCommands (vk::CommandBuffer commandBuffer);
 
         vk::Device getDevice ();
-        vk::Queue getGraphicsQueue ();
-        vk::Queue getPresentQueue ();
         vk::CommandPool getCommandPool ();
-        vk::Extent2D getSwapChainExtent ();
+        vulkan::Window *getWindow ();
+        vulkan::Surface *getSurface ();
+        bool isEnabledValidationLayers ();
+        std::vector<const char *> getValidationLayers ();
+        std::vector<const char *> getRequiredExtensions ();
 
     protected:
-        vk::Extent2D swapChainExtent;
+        Renderer (bool enableValidationLayers);
 
-        vk::PhysicalDevice physicalDevice;
-        vk::UniqueDevice device;
+        void createSurface (vk::ApplicationInfo applicationInfo, int desiredWidth, int desiredHeight);
 
-        vk::Queue graphicsQueue;
-        vk::Queue presentQueue;
+        bool enableValidationLayers;
+        std::vector<const char *> validationLayers;
+        std::vector<const char *> requiredExtensions;
+
+        std::unique_ptr<vulkan::Window> window;
+        std::unique_ptr<vulkan::Surface> surface;
+
 
         vk::UniqueCommandPool commandPool;
 

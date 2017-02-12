@@ -28,9 +28,11 @@ namespace vulkan
         auto currentTime = std::chrono::high_resolution_clock::now ();
         float time = std::chrono::duration_cast<std::chrono::milliseconds> (currentTime - startTime).count () / 1000.0f;
 
+        vk::Extent2D windowSize = renderer->getSurface ()->getSize ();
+
         ubo.model = glm::rotate (glm::mat4 (), time * glm::radians (90.0f), glm::vec3 (0.0f, 0.0f, 1.0f));
         ubo.view = glm::lookAt (cameraPosition, cameraPosition + cameraDirection, cameraUp);
-        ubo.proj = glm::perspective (glm::radians (45.0f), renderer->getSwapChainExtent ().width / (float) renderer->getSwapChainExtent ().height, 0.1f, 1000.0f);
+        ubo.proj = glm::perspective (glm::radians (45.0f), (float) windowSize.width / (float) windowSize.height, 0.1f, 1000.0f);
         ubo.proj[1][1] *= -1;
     }
 

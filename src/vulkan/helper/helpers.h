@@ -18,6 +18,9 @@
 #include "../Mesh.h"
 #include "../Camera.h"
 #include "../Renderer.h"
+#include "../SwapChain.h"
+#include "../Surface.h"
+#include "../Window.h"
 
 
 #endif //VULKANTEST_VULKANHELPER_H

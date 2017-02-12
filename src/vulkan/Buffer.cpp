@@ -43,6 +43,16 @@ namespace vulkan
 
     }
 
+    void Buffer::update (vk::DeviceSize bufferSize, const void *data)
+    {
+        auto device = renderer->getDevice ();
+
+        void *_data = device.mapMemory (**stagingBufferMemory, 0, bufferSize);
+        memcpy (_data, data, (size_t) bufferSize);
+        device.unmapMemory (**stagingBufferMemory);
+
+        helper::BufferHelper::copyBuffer (renderer, **stagingBuffer, **gpuBuffer, bufferSize);
+    }
 
     vk::Buffer Buffer::getBuffer ()
     {

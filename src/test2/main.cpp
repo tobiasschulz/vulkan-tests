@@ -1,8 +1,8 @@
 #include "main.h"
 
 #include "../vulkan/vulkan.h"
-#include "../helper/io.h"
-#include "../helper/helpers.h"
+#include "../vulkan/helper/io.h"
+#include "../vulkan/helper/helpers.h"
 
 #include <iostream>
 #include <stdexcept>
