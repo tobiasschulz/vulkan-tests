@@ -6,9 +6,6 @@
 #define VULKANTEST_UNIFORMBUFFER_H
 
 #include "vulkan.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "helper/UniformBufferObject.h"
 #include "helper/BufferHelper.h"
 #include "Buffer.h"
 

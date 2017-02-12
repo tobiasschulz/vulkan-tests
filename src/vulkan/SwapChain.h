@@ -6,7 +6,6 @@
 #define VULKANTEST_SWAPCHAIN_H
 
 #include "vulkan.h"
-#include "glm/glm.hpp"
 #include "helper/NonCopyable.h"
 #include "Surface.h"
 

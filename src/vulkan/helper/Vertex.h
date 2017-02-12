@@ -6,7 +6,6 @@
 #define VULKANTEST_VERTEX_H
 
 #include "../vulkan.h"
-#include "glm/glm.hpp"
 
 namespace helper
 {

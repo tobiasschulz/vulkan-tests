@@ -13,7 +13,6 @@
 #include "TextureHelper.h"
 #include "Vertex.h"
 #include "../UniformBuffer.h"
-#include "UniformBufferObject.h"
 #include "BufferHelper.h"
 #include "../Mesh.h"
 #include "../FirstPersonCamera.h"

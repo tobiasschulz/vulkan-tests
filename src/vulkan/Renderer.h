@@ -6,7 +6,6 @@
 #define VULKANTEST_RENDERER_H
 
 #include "vulkan.h"
-#include "glm/glm.hpp"
 #include "SwapChain.h"
 #include "Surface.h"
 #include "Window.h"

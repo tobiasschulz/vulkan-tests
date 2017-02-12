@@ -3,6 +3,7 @@
 #include "../vulkan/vulkan.h"
 #include "../vulkan/helper/io.h"
 #include "../vulkan/helper/helpers.h"
+#include "../vulkan/effects/RotatingMesh.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -263,9 +264,55 @@ private:
 
     void createMeshes ()
     {
-        std::shared_ptr<vulkan::Mesh> mesh1 = std::make_shared<vulkan::Mesh> (this);
+        const std::vector<helper::Vertex> vertices_1 = {
+                {{ -1.0f, 5.1f, -1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f }},
+                {{ 1.0f,  5.1f, -1.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f }},
+                {{ 1.0f,  5.1f, 1.0f },  { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f }},
+                {{ -1.0f, 5.1f, 1.0f },  { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
+        };
+
+        const std::vector<helper::Vertex> vertices_4 = {
+                {{ 1.0f, 3.1f, -1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f }},
+                {{ 3.0f,  3.1f, -1.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f }},
+                {{ 3.0f,  3.1f, 1.0f },  { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f }},
+                {{ 1.0f, 3.1f, 1.0f },  { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
+        };
+
+        const std::vector<helper::Vertex> vertices_2 = {
+                {{ -10.0f, -1.0f, -10.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
+                {{ 10.0f,  -1.0f, -10.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
+                {{ 10.0f,  -1.0f, 10.0f },  { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
+                {{ -10.0f, -1.0f, 10.0f },  { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
+        };
+
+        const std::vector<uint16_t> indices = {
+             //   0, 1, 2, 2, 3, 0,
+             //   2, 1, 0, 0, 3, 2,
+                0, 3, 2,
+        };
+
+
+        std::shared_ptr<vulkan::Mesh> mesh1 = std::make_shared<effects::RotatingMesh> (this);
+        mesh1->add(vertices_1, indices);
         mesh1->create ();
         meshes.push_back (mesh1);
+
+        return;
+        std::shared_ptr<vulkan::Mesh> mesh3 = std::make_shared<vulkan::Mesh> (this);
+        mesh3->add(vertices_1, indices);
+        mesh3->create ();
+        meshes.push_back (mesh3);
+
+        std::shared_ptr<vulkan::Mesh> mesh4 = std::make_shared<vulkan::Mesh> (this);
+        mesh4->add(vertices_4, indices);
+        mesh4->create ();
+        meshes.push_back (mesh4);
+
+        return;
+        std::shared_ptr<vulkan::Mesh> mesh2 = std::make_shared<vulkan::Mesh> (this);
+        mesh2->add(vertices_2, indices);
+        mesh2->create ();
+        meshes.push_back (mesh2);
     }
 
     void createUniformBuffer ()

@@ -7,9 +7,6 @@
 
 #include <chrono>
 #include "vulkan.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "helper/UniformBufferObject.h"
 #include "UniformBuffer.h"
 #include "helper/BufferHelper.h"
 

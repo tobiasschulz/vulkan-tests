@@ -2,36 +2,16 @@
 // Created by tobias on 05.02.17.
 //
 
+#include <iostream>
 #include "Mesh.h"
 
 namespace vulkan
 {
-    const std::vector<helper::Vertex> vertices = {
-            {{ -1.0f,  0.1f, -1.0f },  { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f }},
-            {{ 1.0f,   0.1f, -1.0f },  { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f }},
-            {{ 1.0f,   0.1f, 1.0f },   { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f }},
-            {{ -1.0f,  0.1f, 1.0f },   { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
-
-
-            {{ -10.0f, 0.0f, -10.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
-            {{ 10.0f,  0.0f, -10.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
-            {{ 10.0f,  0.0f, 10.0f },  { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
-            {{ -10.0f, 0.0f, 10.0f },  { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f }},
-    };
-
-    const std::vector<uint16_t> indices = {
-            0, 1, 2, 2, 3, 0,
-            2, 1, 0, 0, 3, 2,
-
-            4, 5, 6, 6, 7, 4,
-            6, 5, 4, 4, 7, 6
-    };
-
 
     Mesh::Mesh (vulkan::Renderer *_renderer)
             : renderer (_renderer),
-              vertexBuffer(_renderer, vk::BufferUsageFlagBits::eVertexBuffer),
-              indexBuffer(_renderer, vk::BufferUsageFlagBits::eIndexBuffer)
+              vertexBuffer (_renderer, vk::BufferUsageFlagBits::eVertexBuffer),
+              indexBuffer (_renderer, vk::BufferUsageFlagBits::eIndexBuffer)
     {
     }
 
@@ -39,27 +19,65 @@ namespace vulkan
     {
         // create vertex buffer
         vertexBuffer.create (
-                sizeof (vertices[0]) * vertices.size (), // buffer size
-                vertices.data()
+                vertices.size () == 0 ? 0 : (sizeof (vertices[0]) * vertices.size ()), // buffer size
+                vertices.data ()
         );
         // create vertex buffer
         indexBuffer.create (
-                sizeof (indices[0]) * indices.size (), // buffer size
-                indices.data()
+                indices.size () == 0 ? 0 : (sizeof (indices[0]) * indices.size ()), // buffer size
+                indices.data ()
         );
     }
 
     void Mesh::update (vulkan::FirstPersonCamera *camera)
     {
+        update ();
+    }
+
+    std::vector<helper::Vertex> verticesTransformed;
+
+    void Mesh::update ()
+    {
+        if (modelMatrix == nullptr) {
+            update (&vertices, &indices);
+        }
+        else {
+            if (verticesTransformed.size () == 0) {
+                verticesTransformed.clear ();
+                for (int i = 0; i < vertices.size (); i++) {
+                    auto vertex = vertices[i];
+                    glm::vec4 v = { vertex.pos.x, vertex.pos.y, vertex.pos.z, 1.0f };
+                    //v = (*modelMatrix) * v;
+                    //vertex.pos = { v.x, v.y, v.z };
+                    vertex.pos = { v.x+5, v.y+1, v.z+4 };
+                    //std::cout << v.w << ", ";
+                    verticesTransformed.push_back (vertex);
+
+                    std::cout << vertex.pos.x << " " << vertex.pos.y << " " << vertex.pos.z << ", ";
+                }
+                std::cout << std::endl;
+
+                for (int i = 0; i < indices.size (); i++) {
+                    auto index = indices[i];
+                    std::cout << index << ", ";
+                }
+                std::cout << std::endl;
+            }
+            update (&verticesTransformed, &indices);
+        }
+    }
+
+    void Mesh::update (std::vector<helper::Vertex> *_vertices, std::vector<uint16_t> *_indices)
+    {
         // update vertex buffer
         vertexBuffer.update (
-                sizeof (vertices[0]) * vertices.size (), // buffer size
-                vertices.data()
+                _vertices->size () == 0 ? 0 : (sizeof (_vertices[0]) * _vertices->size ()), // buffer size
+                _vertices->data ()
         );
         // update vertex buffer
         indexBuffer.update (
-                sizeof (indices[0]) * indices.size (), // buffer size
-                indices.data()
+                _indices->size () == 0 ? 0 : (sizeof (_indices[0]) * _indices->size ()), // buffer size
+                _indices->data ()
         );
     }
 
@@ -83,4 +101,39 @@ namespace vulkan
         return (uint32_t) indices.size ();
     }
 
+    void Mesh::setModelMatrix (glm::mat4 m)
+    {
+        modelMatrix = std::make_unique<glm::mat4> (m);
+    }
+
+    void Mesh::clearModelMatrix ()
+    {
+        modelMatrix.reset ();
+    }
+
+    glm::mat4 Mesh::getModelMatrix ()
+    {
+        return *modelMatrix;
+    }
+
+    void Mesh::add (std::vector<helper::Vertex> verticesNew, std::vector<uint16_t> indicesNew)
+    {
+        unsigned short vertexbuffer_size = (unsigned short) vertices.size ();
+        for (size_t i = 0; i < indicesNew.size (); i++) {
+            indices.push_back (indicesNew[i] + vertexbuffer_size);
+        }
+
+        vertices.insert (std::end (vertices), std::begin (verticesNew), std::end (verticesNew));
+    }
+
+    template<size_t N, size_t M>
+    void Mesh::add (std::array<helper::Vertex, N> verticesNew, std::array<uint16_t, M> indicesNew)
+    {
+        unsigned short vertexbuffer_size = (unsigned short) vertices.size ();
+        for (size_t i = 0; i < indicesNew.size (); i++) {
+            indices.push_back (indicesNew[i] + vertexbuffer_size);
+        }
+
+        vertices.insert (std::end (vertices), std::begin (verticesNew), std::end (verticesNew));
+    };
 }

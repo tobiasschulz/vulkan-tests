@@ -76,8 +76,6 @@ set(SOURCE_COMMON
         src/vulkan/helper/BufferHelper.h
         src/vulkan/UniformBuffer.cpp
         src/vulkan/UniformBuffer.h
-        src/vulkan/helper/UniformBufferObject.cpp
-        src/vulkan/helper/UniformBufferObject.h
         src/vulkan/FirstPersonCamera.cpp
         src/vulkan/FirstPersonCamera.h
         src/vulkan/Buffer.cpp
@@ -89,6 +87,8 @@ set(SOURCE_COMMON
         src/vulkan/helper/NonCopyable.h
         src/vulkan/Window.cpp
         src/vulkan/Window.h
+        src/vulkan/effects/RotatingMesh.cpp
+        src/vulkan/effects/RotatingMesh.h
         )
 
 # TEST 1

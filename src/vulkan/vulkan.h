@@ -1,9 +1,20 @@
+//
+// Created by tobias on 12.02.17.
+//
+
+#ifndef VULKANTEST_VULKAN_H
+#define VULKANTEST_VULKAN_H
 
 #define vkCreateDebugReportCallbackEXT(a, b, c, d) __vkCreateDebugReportCallbackEXT(a, b, c, d)
 #define vkDestroyDebugReportCallbackEXT(a, b, c) __vkDestroyDebugReportCallbackEXT(a, b, c)
 
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan.hpp>
+
+//#define GLM_SWIZZLE
+
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -42,3 +53,4 @@ namespace vk
     typedef std::shared_ptr<UniqueSwapchainKHR> SharedSwapchainKHR;
 }
 
+#endif
