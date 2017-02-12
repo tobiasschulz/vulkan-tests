@@ -54,7 +54,6 @@ namespace vulkan
         auto device = surface->getDevice ();
 
         helper::SwapChainSupport s = helper::SwapChainSupport::querySwapChainSupport (surface->getSurface (), surface->getPhysicalDevice ());
-
         vk::SurfaceFormatKHR surfaceFormat = s.chooseSwapSurfaceFormat ();
         vk::PresentModeKHR presentMode = s.chooseSwapPresentMode ();
         vk::Extent2D extent = s.chooseSwapExtent (desiredWidth, desiredHeight);

@@ -25,6 +25,7 @@ namespace vulkan
         _createRenderPass ();
 
         swapChain->create (desiredWidth, desiredHeight);
+
     }
 
     vk::Instance Surface::getInstance ()
@@ -217,9 +218,12 @@ namespace vulkan
 
     void Surface::_createRenderPass ()
     {
+        helper::SwapChainSupport s = helper::SwapChainSupport::querySwapChainSupport (surface, physicalDevice);
+        vk::SurfaceFormatKHR surfaceFormat = s.chooseSwapSurfaceFormat ();
+
 
         vk::AttachmentDescription colorAttachment;
-        colorAttachment.format = swapChain->getImageFormat ();
+        colorAttachment.format =  surfaceFormat.format;
         colorAttachment.samples = vk::SampleCountFlagBits::e1;
         colorAttachment.loadOp = vk::AttachmentLoadOp::eClear;
         colorAttachment.storeOp = vk::AttachmentStoreOp::eStore;

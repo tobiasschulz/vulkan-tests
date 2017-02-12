@@ -345,12 +345,14 @@ private:
         auto framebuffers = surface->getSwapChain ()->getFramebuffers ();
         auto windowSize = surface->getSize ();
 
-        vk::CommandBufferAllocateInfo allocInfo (
-                *commandPool,
-                vk::CommandBufferLevel::ePrimary,
-                (uint32_t) framebuffers.size ()
-        );
-        commandBuffers = device.allocateCommandBuffersUnique (allocInfo);
+        if (commandBuffers.size ()==0) {
+            vk::CommandBufferAllocateInfo allocInfo (
+                    *commandPool,
+                    vk::CommandBufferLevel::ePrimary,
+                    (uint32_t) framebuffers.size ()
+            );
+            commandBuffers = device.allocateCommandBuffersUnique (allocInfo);
+        }
 
         for (size_t i = 0; i < commandBuffers.size (); i++) {
             auto &cmd = commandBuffers[i];
@@ -361,7 +363,7 @@ private:
             vk::RenderPassBeginInfo renderPassInfo;
             auto p = surface->getRenderPass ();
             renderPassInfo.renderPass = p;
-            renderPassInfo.framebuffer = *framebuffers[i];
+            renderPassInfo.framebuffer = framebuffers[i];
             renderPassInfo.renderArea.offset = vk::Offset2D (0, 0);
             renderPassInfo.renderArea.extent = windowSize;
 
