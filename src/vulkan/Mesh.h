@@ -10,7 +10,7 @@
 #include "Renderer.h"
 #include "helper/Vertex.h"
 #include "helper/BufferHelper.h"
-#include "Camera.h"
+#include "FirstPersonCamera.h"
 #include "Buffer.h"
 
 namespace vulkan
@@ -22,7 +22,7 @@ namespace vulkan
         Mesh (vulkan::Renderer *renderer);
 
         void create ();
-        void update (vulkan::Camera* camera);
+        void update (vulkan::FirstPersonCamera* camera);
 
         vk::Buffer getVertexBuffer ();
         uint32_t getVertexCount ();

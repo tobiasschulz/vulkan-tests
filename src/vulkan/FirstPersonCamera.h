@@ -10,24 +10,30 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "helper/UniformBufferObject.h"
-#include "helper/UniformBuffer.h"
+#include "UniformBuffer.h"
 #include "helper/BufferHelper.h"
 
 namespace vulkan
 {
 
-    class Camera
+    class FirstPersonCamera
     {
     public:
-        Camera ();
+        struct UniformBufferObject
+        {
+            glm::mat4 model;
+            glm::mat4 view;
+            glm::mat4 proj;
+        };
+
+        FirstPersonCamera ();
 
         void update (vulkan::Renderer *renderer);
-        helper::UniformBufferObject getUniformBufferObject ();
-
         void handleKeypress (int key, int action, int mods);
+        UniformBufferObject getUniformBufferObject ();
 
     private:
-        helper::UniformBufferObject ubo;
+        UniformBufferObject ubo;
 
         glm::vec3 cameraPosition;
         glm::vec3 cameraDirection;

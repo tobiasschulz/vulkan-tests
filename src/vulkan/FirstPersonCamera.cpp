@@ -2,12 +2,12 @@
 // Created by tobias on 07.02.17.
 //
 
-#include "Camera.h"
+#include "FirstPersonCamera.h"
 
 namespace vulkan
 {
 
-    Camera::Camera ()
+    FirstPersonCamera::FirstPersonCamera ()
     {
         ubo = {};
         cameraPosition = glm::vec3 (2.0f, 2.0f, 2.0f);
@@ -16,12 +16,12 @@ namespace vulkan
         speed = 0.10f;
     }
 
-    helper::UniformBufferObject Camera::getUniformBufferObject ()
+    FirstPersonCamera::UniformBufferObject FirstPersonCamera::getUniformBufferObject ()
     {
         return ubo;
     }
 
-    void Camera::update (vulkan::Renderer *renderer)
+    void FirstPersonCamera::update (vulkan::Renderer *renderer)
     {
         static auto startTime = std::chrono::high_resolution_clock::now ();
 
@@ -36,7 +36,7 @@ namespace vulkan
         ubo.proj[1][1] *= -1;
     }
 
-    void Camera::handleKeypress (int key, int action, int mods)
+    void FirstPersonCamera::handleKeypress (int key, int action, int mods)
     {
         if (key == GLFW_KEY_W && action != GLFW_RELEASE) {
             cameraPosition += cameraDirection * speed;
@@ -59,4 +59,5 @@ namespace vulkan
         else {
         }
     }
+
 }

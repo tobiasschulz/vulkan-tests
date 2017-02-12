@@ -24,8 +24,10 @@ namespace vulkan
         vk::Buffer getBuffer ();
         vk::DeviceSize getBufferSize ();
 
-    private:
+    protected:
         vulkan::Renderer *renderer;
+
+    private:
         vk::BufferUsageFlagBits bufferUsage;
         vk::DeviceSize bufferSize;
 

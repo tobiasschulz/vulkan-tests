@@ -26,7 +26,8 @@ class HelloTriangleApplication : public vulkan::Renderer
 {
 public:
     HelloTriangleApplication ()
-            : Renderer (ENABLE_VALIDATION_LAYERS)
+            : Renderer (ENABLE_VALIDATION_LAYERS),
+              uniformBuffer (this)
     {
     }
 
@@ -46,8 +47,8 @@ private:
 
     std::vector<std::shared_ptr<helper::Texture>> textures;
     std::vector<std::shared_ptr<vulkan::Mesh>> meshes;
-    helper::UniformBuffer uniformBuffer;
-    vulkan::Camera camera;
+    vulkan::FirstPersonCamera camera;
+    vulkan::UniformBuffer<vulkan::FirstPersonCamera::UniformBufferObject> uniformBuffer;
 
     vk::UniqueDescriptorPool descriptorPool;
     vk::UniqueDescriptorSet descriptorSet;
@@ -97,7 +98,7 @@ private:
             glfwPollEvents ();
 
             camera.update (this);
-            uniformBuffer.update (this, camera.getUniformBufferObject ());
+            uniformBuffer.update (camera.getUniformBufferObject ());
             for (uint32_t m = 0; m < meshes.size (); m++) {
                 auto &mesh = meshes[m];
                 mesh->update (&camera);
@@ -267,10 +268,9 @@ private:
         meshes.push_back (mesh1);
     }
 
-
     void createUniformBuffer ()
     {
-        uniformBuffer.create (this);
+        uniformBuffer.create (camera.getUniformBufferObject ());
     }
 
     void createDescriptorPool ()
@@ -309,7 +309,7 @@ private:
         std::vector<vk::WriteDescriptorSet> descriptorWrites;
 
         // write uniform buffer object
-        vk::DescriptorBufferInfo uboInfo (*uniformBuffer.uniformBuffer, 0, sizeof (helper::UniformBufferObject));
+        vk::DescriptorBufferInfo uboInfo (uniformBuffer.getBuffer (), 0, uniformBuffer.getBufferSize ());
         vk::WriteDescriptorSet uboWrite;
         uboWrite.dstSet = *descriptorSet;
         uboWrite.dstBinding = 0;
@@ -345,7 +345,7 @@ private:
         auto framebuffers = surface->getSwapChain ()->getFramebuffers ();
         auto windowSize = surface->getSize ();
 
-        if (commandBuffers.size ()==0) {
+        if (commandBuffers.size () == 0) {
             vk::CommandBufferAllocateInfo allocInfo (
                     *commandPool,
                     vk::CommandBufferLevel::ePrimary,

@@ -49,7 +49,7 @@ namespace vulkan
         );
     }
 
-    void Mesh::update (vulkan::Camera *camera)
+    void Mesh::update (vulkan::FirstPersonCamera *camera)
     {
         // update vertex buffer
         vertexBuffer.update (

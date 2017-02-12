@@ -74,12 +74,12 @@ set(SOURCE_COMMON
         src/vulkan/helper/TextureHelper.h
         src/vulkan/helper/BufferHelper.cpp
         src/vulkan/helper/BufferHelper.h
-        src/vulkan/helper/UniformBuffer.cpp
-        src/vulkan/helper/UniformBuffer.h
+        src/vulkan/UniformBuffer.cpp
+        src/vulkan/UniformBuffer.h
         src/vulkan/helper/UniformBufferObject.cpp
         src/vulkan/helper/UniformBufferObject.h
-        src/vulkan/Camera.cpp
-        src/vulkan/Camera.h
+        src/vulkan/FirstPersonCamera.cpp
+        src/vulkan/FirstPersonCamera.h
         src/vulkan/Buffer.cpp
         src/vulkan/Buffer.h
         src/vulkan/SwapChain.cpp
