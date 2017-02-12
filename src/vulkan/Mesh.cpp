@@ -20,12 +20,12 @@ namespace vulkan
     {
         // create vertex buffer
         vertexBuffer.create (
-                vertices.size () == 0 ? 0 : (sizeof (vertices[0]) * vertices.size ()), // buffer size
+                sizeof (helper::Vertex) * vertices.size (), // buffer size
                 vertices.data ()
         );
         // create vertex buffer
         indexBuffer.create (
-                indices.size () == 0 ? 0 : (sizeof (indices[0]) * indices.size ()), // buffer size
+                sizeof (uint16_t) * indices.size (), // buffer size
                 indices.data ()
         );
     }
@@ -50,23 +50,12 @@ namespace vulkan
                 glm::vec4 v = { vertex.pos.x, vertex.pos.y, vertex.pos.z, 1.0f };
                 v = (*modelMatrix) * v;
                 vertex.pos = { v.x, v.y, v.z };
-                //vertex.pos = { v.x + 5, v.y + 1, v.z + 4 };
-                //std::cout << v.w << ", ";
                 verticesTransformed.push_back (vertex);
-
-                std::cout << vertex.pos.x << " " << vertex.pos.y << " " << vertex.pos.z << ", ";
+                //std::cout << v.x << " " << v.y << " " << v.z << " ; ";
             }
-            std::cout << std::endl;
+            //std::cout << std::endl;
 
-            indicesTransformed.clear ();
-            for (int i = 0; i < indices.size (); i++) {
-                auto index = indices[i];
-                std::cout << index << ", ";
-                indicesTransformed.push_back(index);
-            }
-            std::cout << std::endl;
-
-            update (&verticesTransformed, &indicesTransformed);
+            update (&verticesTransformed, &indices);
         }
     }
 
@@ -74,14 +63,24 @@ namespace vulkan
     {
         // update vertex buffer
         vertexBuffer.update (
-                _vertices->size () == 0 ? 0 : (sizeof (_vertices[0]) * _vertices->size ()), // buffer size
+                sizeof (helper::Vertex) * _vertices->size (), // buffer size
                 _vertices->data ()
         );
         // update vertex buffer
         indexBuffer.update (
-                _indices->size () == 0 ? 0 : (sizeof (_indices[0]) * _indices->size ()), // buffer size
+                sizeof (uint16_t) * _indices->size (), // buffer size
                 _indices->data ()
         );
+    }
+
+    std::vector<helper::Vertex> Mesh::getVertexVector ()
+    {
+        return vertices;
+    }
+
+    std::vector<uint16_t> Mesh::getIndexVector ()
+    {
+        return indices;
     }
 
     vk::Buffer Mesh::getVertexBuffer ()

@@ -29,8 +29,10 @@ namespace vulkan
         template<size_t N, size_t M>
         void add (std::array<helper::Vertex, N> verticesNew, std::array<uint16_t, M> indicesNew);
 
+        std::vector<helper::Vertex> getVertexVector ();
         vk::Buffer getVertexBuffer ();
         uint32_t getVertexCount ();
+        std::vector<uint16_t> getIndexVector ();
         vk::Buffer getIndexBuffer ();
         uint32_t getIndexCount ();
 
