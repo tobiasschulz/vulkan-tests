@@ -13,6 +13,7 @@ namespace vulkan
               vertexBuffer (_renderer, vk::BufferUsageFlagBits::eVertexBuffer),
               indexBuffer (_renderer, vk::BufferUsageFlagBits::eIndexBuffer)
     {
+        vertices.push_back ({});
     }
 
     void Mesh::create ()
@@ -35,6 +36,7 @@ namespace vulkan
     }
 
     std::vector<helper::Vertex> verticesTransformed;
+    std::vector<uint16_t> indicesTransformed;
 
     void Mesh::update ()
     {
@@ -42,28 +44,29 @@ namespace vulkan
             update (&vertices, &indices);
         }
         else {
-            if (verticesTransformed.size () == 0) {
-                verticesTransformed.clear ();
-                for (int i = 0; i < vertices.size (); i++) {
-                    auto vertex = vertices[i];
-                    glm::vec4 v = { vertex.pos.x, vertex.pos.y, vertex.pos.z, 1.0f };
-                    //v = (*modelMatrix) * v;
-                    //vertex.pos = { v.x, v.y, v.z };
-                    vertex.pos = { v.x+5, v.y+1, v.z+4 };
-                    //std::cout << v.w << ", ";
-                    verticesTransformed.push_back (vertex);
+            verticesTransformed.clear ();
+            for (int i = 0; i < vertices.size (); i++) {
+                auto vertex = vertices[i];
+                glm::vec4 v = { vertex.pos.x, vertex.pos.y, vertex.pos.z, 1.0f };
+                v = (*modelMatrix) * v;
+                vertex.pos = { v.x, v.y, v.z };
+                //vertex.pos = { v.x + 5, v.y + 1, v.z + 4 };
+                //std::cout << v.w << ", ";
+                verticesTransformed.push_back (vertex);
 
-                    std::cout << vertex.pos.x << " " << vertex.pos.y << " " << vertex.pos.z << ", ";
-                }
-                std::cout << std::endl;
-
-                for (int i = 0; i < indices.size (); i++) {
-                    auto index = indices[i];
-                    std::cout << index << ", ";
-                }
-                std::cout << std::endl;
+                std::cout << vertex.pos.x << " " << vertex.pos.y << " " << vertex.pos.z << ", ";
             }
-            update (&verticesTransformed, &indices);
+            std::cout << std::endl;
+
+            indicesTransformed.clear ();
+            for (int i = 0; i < indices.size (); i++) {
+                auto index = indices[i];
+                std::cout << index << ", ";
+                indicesTransformed.push_back(index);
+            }
+            std::cout << std::endl;
+
+            update (&verticesTransformed, &indicesTransformed);
         }
     }
 
