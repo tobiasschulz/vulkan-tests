@@ -8,8 +8,8 @@ namespace helper
 {
 
 
-    std::pair<std::shared_ptr<vk::UniqueBuffer>, std::shared_ptr<vk::UniqueDeviceMemory>>
-    BufferHelper::createBufferShared (vulkan::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
+    std::pair<vk::SharedBuffer, vk::SharedDeviceMemory> BufferHelper::createBufferShared (vulkan::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage,
+                                                                                          vk::MemoryPropertyFlags properties)
     {
         vk::Buffer _indexBuffer;
         vk::DeviceMemory _indexBufferMemory;
@@ -17,8 +17,8 @@ namespace helper
         return std::make_pair (std::make_shared<vk::UniqueBuffer> (_indexBuffer), std::make_shared<vk::UniqueDeviceMemory> (_indexBufferMemory));
     }
 
-    std::pair<vk::UniqueBuffer, vk::UniqueDeviceMemory>
-    BufferHelper::createBufferUnique (vulkan::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
+    std::pair<vk::UniqueBuffer, vk::UniqueDeviceMemory> BufferHelper::createBufferUnique (vulkan::Renderer *renderer, vk::DeviceSize size, vk::BufferUsageFlags usage,
+                                                                                          vk::MemoryPropertyFlags properties)
     {
         vk::Buffer _indexBuffer;
         vk::DeviceMemory _indexBufferMemory;
