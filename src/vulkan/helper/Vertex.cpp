@@ -33,49 +33,6 @@ namespace helper
         return lhs;
     }
 
-    std::ostream &operator<< (std::ostream &out, const std::vector<Vertex> &v)
-    {
-        out << "{ ";
-        for (size_t i = 0; i < v.size (); i++) {
-            if (i != 0) out << ", ";
-            out << v[i];
-        }
-        out << " }";
-        return out;
-    }
-
-    std::ostream &operator<< (std::ostream &out, const Vertex &v)
-    {
-        out << "[";
-        std::stringstream ss;
-        ss << v.pos;
-        out << std::setw(24) << std:: right << ss.str () << ", ";
-        ss.str(std::string());
-        ss << v.color;
-        out << std::setw(12) << std:: right << ss.str () << ", ";
-        ss.str(std::string());
-        ss << v.texCoord;
-        out << std::setw(8) << std:: right << ss.str ();
-        out << "]";
-        return out;
-        // return out << "(" << v.pos << ", " << v.color << ", " << v.texCoord << ")";
-    }
-
-    std::ostream &operator<< (std::ostream &out, const glm::vec4 &v)
-    {
-        return out << "(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
-    }
-
-    std::ostream &operator<< (std::ostream &out, const glm::vec3 &v)
-    {
-        return out << "(" << v.x << ", " << v.y << ", " << v.z << ")";
-    }
-
-    std::ostream &operator<< (std::ostream &out, const glm::vec2 &v)
-    {
-        return out << "(" << v.x << ", " << v.y << ")";
-    }
-
     vk::VertexInputBindingDescription Vertex::getBindingDescription ()
     {
         vk::VertexInputBindingDescription bindingDescription;
@@ -107,4 +64,48 @@ namespace helper
         return attributeDescriptions;
     }
 
+}
+
+
+std::ostream &operator<< (std::ostream &out, const std::vector<helper::Vertex> &v)
+{
+    out << "{ ";
+    for (size_t i = 0; i < v.size (); i++) {
+        if (i != 0) out << ", ";
+        out << v[i];
+    }
+    out << " }";
+    return out;
+}
+
+std::ostream &operator<< (std::ostream &out, const helper::Vertex &v)
+{
+    out << "[";
+    std::stringstream ss;
+    ss << v.pos;
+    out << std::setw(24) << std:: right << ss.str () << ", ";
+    ss.str(std::string());
+    ss << v.color;
+    out << std::setw(12) << std:: right << ss.str () << ", ";
+    ss.str(std::string());
+    ss << v.texCoord;
+    out << std::setw(8) << std:: right << ss.str ();
+    out << "]";
+    return out;
+    // return out << "(" << v.pos << ", " << v.color << ", " << v.texCoord << ")";
+}
+
+std::ostream &operator<< (std::ostream &out, const glm::vec4 &v)
+{
+    return out << "(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
+}
+
+std::ostream &operator<< (std::ostream &out, const glm::vec3 &v)
+{
+    return out << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+}
+
+std::ostream &operator<< (std::ostream &out, const glm::vec2 &v)
+{
+    return out << "(" << v.x << ", " << v.y << ")";
 }

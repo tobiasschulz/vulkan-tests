@@ -68,6 +68,10 @@ private:
             auto &that = *static_cast<HelloTriangleApplication *>(glfwGetWindowUserPointer (w));
             that.handleKeypress (w, key, scancode, action, mods);
         });
+        glfwSetCursorPosCallback (window->getNativeWindow (), [] (GLFWwindow *w, double x, double y) {
+            auto that = static_cast<HelloTriangleApplication *>(glfwGetWindowUserPointer (w));
+            that->camera.handleMouseMove (that, (int)x, (int)y);
+        });
     }
 
     void initVulkan ()

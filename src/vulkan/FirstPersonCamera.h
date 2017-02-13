@@ -27,6 +27,7 @@ namespace vulkan
 
         void update (vulkan::Renderer *renderer);
         void handleKeypress (int key, int action, int mods);
+        void handleMouseMove (vulkan::Renderer *renderer, int x, int y);
         UniformBufferObject getUniformBufferObject ();
 
     private:

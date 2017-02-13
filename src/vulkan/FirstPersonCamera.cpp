@@ -2,6 +2,8 @@
 // Created by tobias on 07.02.17.
 //
 
+#include <iostream>
+#include "helper/Vertex.h"
 #include "FirstPersonCamera.h"
 
 namespace vulkan
@@ -21,6 +23,39 @@ namespace vulkan
         return ubo;
     }
 
+    float yaw;
+    float pitch;
+    bool mouseSet = false;
+
+    void FirstPersonCamera::handleMouseMove (vulkan::Renderer *renderer, int x, int y)
+    {
+        if (!mouseSet) {
+            vk::Extent2D windowSize = renderer->getSurface ()->getSize ();
+            GLfloat centerX, centerY;
+            centerX = windowSize.width / 2;
+            centerY = windowSize.height / 2;
+
+            GLfloat xoffset = x - centerX;
+            GLfloat yoffset = y - centerY;
+            GLfloat sensitivity = 800.0f;
+            xoffset /= sensitivity;
+            yoffset /= sensitivity;
+
+            yaw += -xoffset;
+            pitch += -yoffset;
+
+            cameraDirection = glm::vec3 (cos (pitch) * sin (yaw), sin (pitch), cos (pitch) * cos (yaw));
+            std::cout << "cameraDirection: " << cameraDirection << std::endl;
+
+            mouseSet = true;
+            glfwSetCursorPos (renderer->getWindow ()->getNativeWindow (), centerX, centerY);
+        }
+        else {
+            mouseSet = false;
+        }
+    }
+
+
     void FirstPersonCamera::update (vulkan::Renderer *renderer)
     {
         // static auto startTime = std::chrono::high_resolution_clock::now ();
@@ -34,6 +69,7 @@ namespace vulkan
         ubo.view = glm::lookAt (cameraPosition, cameraPosition + cameraDirection, cameraUp);
         ubo.proj = glm::perspective (glm::radians (45.0f), (float) windowSize.width / (float) windowSize.height, 0.1f, 1000.0f);
         ubo.proj[1][1] *= -1;
+
     }
 
     void FirstPersonCamera::handleKeypress (int key, int action, int mods)
