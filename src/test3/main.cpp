@@ -309,15 +309,21 @@ private:
         std::mt19937 rng (rd ());
         std::uniform_int_distribution<int> uni (0, 1000000);
 
-        const size_t block_width = 10;
-        const size_t block_depth = 10;
+        const size_t block_width = 20;
+        const size_t block_depth = 20;
         const size_t block_height = 5;
         bool blocks[block_width][block_depth][block_height] = {};
         for (size_t x = 0; x < block_width; x++) {
             for (size_t z = 0; z < block_depth; z++) {
-                for (size_t y = 0; y < block_height; y++) {
+                blocks[x][z][0] = true;
+            }
+        }
+        for (size_t y = 1; y < block_height; y++) {
+            for (size_t x = 1; x < block_width - 1; x++) {
+                for (size_t z = 1; z < block_depth - 1; z++) {
+                    float is_set_probability = blocks[x + 1][z][y - 1] + blocks[x][z + 1][y - 1] + blocks[x - 1][z][y - 1] + blocks[x][z - 1][y - 1] + blocks[x][z][y - 1];
                     auto random_integer = uni (rng);
-                    bool is_set = random_integer % 100 > 80;
+                    bool is_set = random_integer % 1000 < 900 / 5 * is_set_probability; // (80 - ((x > 0 && blocks[x - 1][z][y]) ? 30 : 0) - ((z > 0 && blocks[x][z - 1][y]) ? 30 : 0));
                     blocks[x][z][y] = is_set;
                     if (!is_set) break;
                 }
