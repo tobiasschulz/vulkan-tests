@@ -62,6 +62,8 @@ private:
     {
         window->create (WIDTH, HEIGHT);
 
+        glfwSetInputMode(window->getNativeWindow (), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
         glfwSetWindowUserPointer (window->getNativeWindow (), this);
         glfwSetKeyCallback (window->getNativeWindow (), [] (GLFWwindow *w, int key, int scancode, int action, int mods) {
             // Here we retrieve the pointer we setted before. It will be equal to `this`
