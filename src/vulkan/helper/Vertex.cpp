@@ -3,9 +3,78 @@
 //
 
 #include "Vertex.h"
+#include <iostream>
+#include <iomanip>
 
 namespace helper
 {
+
+    Vertex::Vertex ()
+            : pos (), color (), texCoord ()
+    {
+    }
+
+    Vertex::Vertex (glm::vec3 pos, glm::vec3 color, glm::vec2 texCoord)
+            : pos (pos), color (color), texCoord (texCoord)
+    {
+    }
+
+    Vertex &Vertex::operator+= (const Vertex &rhs)
+    {
+        pos += rhs.pos;
+        color += rhs.color;
+        texCoord += rhs.texCoord;
+        return *this;
+    }
+
+    Vertex operator+ (Vertex lhs, const Vertex &rhs)
+    {
+        lhs += rhs;
+        return lhs;
+    }
+
+    std::ostream &operator<< (std::ostream &out, const std::vector<Vertex> &v)
+    {
+        out << "{ ";
+        for (size_t i = 0; i < v.size (); i++) {
+            if (i != 0) out << ", ";
+            out << v[i];
+        }
+        out << " }";
+        return out;
+    }
+
+    std::ostream &operator<< (std::ostream &out, const Vertex &v)
+    {
+        out << "[";
+        std::stringstream ss;
+        ss << v.pos;
+        out << std::setw(24) << std:: right << ss.str () << ", ";
+        ss.str(std::string());
+        ss << v.color;
+        out << std::setw(12) << std:: right << ss.str () << ", ";
+        ss.str(std::string());
+        ss << v.texCoord;
+        out << std::setw(8) << std:: right << ss.str ();
+        out << "]";
+        return out;
+        // return out << "(" << v.pos << ", " << v.color << ", " << v.texCoord << ")";
+    }
+
+    std::ostream &operator<< (std::ostream &out, const glm::vec4 &v)
+    {
+        return out << "(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
+    }
+
+    std::ostream &operator<< (std::ostream &out, const glm::vec3 &v)
+    {
+        return out << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+    }
+
+    std::ostream &operator<< (std::ostream &out, const glm::vec2 &v)
+    {
+        return out << "(" << v.x << ", " << v.y << ")";
+    }
 
     vk::VertexInputBindingDescription Vertex::getBindingDescription ()
     {

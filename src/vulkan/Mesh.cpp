@@ -138,4 +138,42 @@ namespace vulkan
 
         vertices.insert (std::end (vertices), std::begin (verticesNew), std::end (verticesNew));
     };
+
+    void Mesh::addRectangle (helper::Vertex min, helper::Vertex max)
+    {
+        static const std::vector<uint16_t> indicesNew = {
+                0, 1, 2, 2, 3, 0,
+                2, 1, 0, 0, 3, 2,
+        };
+
+
+        if (min.pos.y == max.pos.y) {
+            const std::vector<helper::Vertex> verticesNewY = {
+                    {{ min.pos.x, min.pos.y, min.pos.z }, { min.color.x, min.color.y, min.color.z }, { min.texCoord.x, min.texCoord.y }},
+                    {{ max.pos.x, min.pos.y, min.pos.z }, { max.color.x, min.color.y, min.color.z }, { max.texCoord.x, min.texCoord.y }},
+                    {{ max.pos.x, min.pos.y, max.pos.z }, { max.color.x, min.color.y, max.color.z }, { max.texCoord.x, max.texCoord.y }},
+                    {{ min.pos.x, min.pos.y, max.pos.z }, { min.color.x, min.color.y, max.color.z }, { min.texCoord.x, max.texCoord.y }},
+            };
+            std::cout << verticesNewY << std::endl;
+            add (verticesNewY, indicesNew);
+        }
+        else if (min.pos.x == max.pos.x) {
+            const std::vector<helper::Vertex> verticesNewX = {
+                    {{ min.pos.x, min.pos.y, min.pos.z }, { min.color.x, min.color.y, min.color.z }, { min.texCoord.x, min.texCoord.y }},
+                    {{ min.pos.x, max.pos.y, min.pos.z }, { max.color.x, min.color.y, min.color.z }, { max.texCoord.x, min.texCoord.y }},
+                    {{ min.pos.x, max.pos.y, max.pos.z }, { max.color.x, min.color.y, max.color.z }, { max.texCoord.x, max.texCoord.y }},
+                    {{ min.pos.x, min.pos.y, max.pos.z }, { min.color.x, min.color.y, max.color.z }, { min.texCoord.x, max.texCoord.y }},
+            };
+            add (verticesNewX, indicesNew);
+        }
+        else if (min.pos.z == max.pos.z) {
+            const std::vector<helper::Vertex> verticesNewZ = {
+                    {{ min.pos.x, min.pos.y, min.pos.z }, { min.color.x, min.color.y, min.color.z }, { min.texCoord.x, min.texCoord.y }},
+                    {{ max.pos.x, min.pos.y, min.pos.z }, { max.color.x, min.color.y, min.color.z }, { max.texCoord.x, min.texCoord.y }},
+                    {{ max.pos.x, max.pos.y, min.pos.z }, { max.color.x, min.color.y, max.color.z }, { max.texCoord.x, max.texCoord.y }},
+                    {{ min.pos.x, max.pos.y, min.pos.z }, { min.color.x, min.color.y, max.color.z }, { min.texCoord.x, max.texCoord.y }},
+            };
+            add (verticesNewZ, indicesNew);
+        }
+    }
 }

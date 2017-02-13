@@ -262,7 +262,7 @@ private:
         textures.push_back (tex1);
     }
 
-    void createMeshes ()
+    void createMeshes__2 ()
     {
         const std::vector<helper::Vertex> vertices_1 = {
                 {{ -1.0f, 5.1f, -1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f }},
@@ -286,8 +286,8 @@ private:
         };
 
         const std::vector<uint16_t> indices = {
-                   0, 1, 2, 2, 3, 0,
-                   2, 1, 0, 0, 3, 2,
+                0, 1, 2, 2, 3, 0,
+                2, 1, 0, 0, 3, 2,
                 //0, 3, 2,
         };
 
@@ -301,6 +301,61 @@ private:
         mesh2->add (vertices_2, indices);
         mesh2->create ();
         meshes.push_back (mesh2);
+    }
+
+    void createMeshes ()
+    {
+        std::random_device rd;
+        std::mt19937 rng (rd ());
+        std::uniform_int_distribution<int> uni (0, 1000000);
+
+        const size_t block_width = 10;
+        const size_t block_depth = 10;
+        const size_t block_height = 5;
+        bool blocks[block_width][block_depth][block_height] = {};
+        for (size_t x = 0; x < block_width; x++) {
+            for (size_t z = 0; z < block_depth; z++) {
+                for (size_t y = 0; y < block_height; y++) {
+                    auto random_integer = uni (rng);
+                    bool is_set = random_integer % 100 > 80;
+                    blocks[x][z][y] = is_set;
+                    if (!is_set) break;
+                }
+            }
+        }
+
+
+        std::shared_ptr<vulkan::Mesh> meshBlocks = std::make_shared<vulkan::Mesh> (this);
+
+        for (size_t x = 0; x < block_width; x++) {
+            for (size_t z = 0; z < block_depth; z++) {
+                for (size_t y = 0; y < block_height; y++) {
+                    bool is_set = blocks[x][z][y];
+                    if (!is_set) continue;
+                    int _x = (int) x - (int) block_width / 2;
+                    int _z = (int) z - (int) block_depth / 2;
+                    int _y = (int) y - (int) block_height / 2;
+
+                    const float padding = 0.05f;
+                    const float width = 1.0f - 2 * padding;
+
+                    helper::Vertex min ({ _x + padding, _y + padding, _z + padding }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f });
+                    helper::Vertex max = min + helper::Vertex ({ width, width, width }, {}, { 1.0f, 1.0f });
+
+                    meshBlocks->addRectangle (min, min + helper::Vertex ({ width, 0.0f, width }, {}, { 1.0f, 1.0f }));
+                    meshBlocks->addRectangle (min, min + helper::Vertex ({ 0.0f, width, width }, {}, { 1.0f, 1.0f }));
+                    meshBlocks->addRectangle (min, min + helper::Vertex ({ width, width, 0.0f }, {}, { 1.0f, 1.0f }));
+                    meshBlocks->addRectangle (min + helper::Vertex ({ 0.0f, width, 0.0f }, {}, {}), max);
+                    meshBlocks->addRectangle (min + helper::Vertex ({ width, 0.0f, 0.0f }, {}, {}), max);
+                    meshBlocks->addRectangle (min + helper::Vertex ({ 0.0f, 0.0f, width }, {}, {}), max);
+                }
+            }
+        }
+
+        meshBlocks->create ();
+        meshes.push_back (meshBlocks);
+
+
     }
 
     void createUniformBuffer ()

@@ -10,7 +10,7 @@ namespace vulkan
     FirstPersonCamera::FirstPersonCamera ()
     {
         ubo = {};
-        cameraPosition = glm::vec3 (20.0f, 15.0f, 20.0f);
+        cameraPosition = glm::vec3 (1.0f, 1.0f, 1.0f) * 10.0f;
         cameraDirection = glm::normalize (-cameraPosition); //glm::vec3 (-1.0f, -1.0f, -1.0f);
         cameraUp = glm::vec3 (0.0f, 1.0f, 0.0f);
         speed = 0.10f;

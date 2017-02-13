@@ -29,6 +29,8 @@ namespace vulkan
         template<size_t N, size_t M>
         void add (std::array<helper::Vertex, N> verticesNew, std::array<uint16_t, M> indicesNew);
 
+        void addRectangle (helper::Vertex min, helper::Vertex max);
+
         std::vector<helper::Vertex> getVertexVector ();
         vk::Buffer getVertexBuffer ();
         uint32_t getVertexCount ();
@@ -36,9 +38,9 @@ namespace vulkan
         vk::Buffer getIndexBuffer ();
         uint32_t getIndexCount ();
 
-        void setModelMatrix(glm::mat4 m);
+        void setModelMatrix (glm::mat4 m);
         void clearModelMatrix ();
-        glm::mat4 getModelMatrix();
+        glm::mat4 getModelMatrix ();
 
     private:
         vulkan::Renderer *renderer;

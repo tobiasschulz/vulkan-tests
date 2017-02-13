@@ -18,7 +18,20 @@ namespace helper
 
         static vk::VertexInputBindingDescription getBindingDescription ();
         static std::array<vk::VertexInputAttributeDescription, 3> getAttributeDescriptions ();
+
+        Vertex ();
+        Vertex (glm::vec3 pos, glm::vec3 color = glm::vec3 (), glm::vec2 texCoord = glm::vec3 ());
+
+        Vertex &operator+= (const Vertex &rhs);
+
+        friend Vertex operator+ (Vertex lhs, const Vertex &rhs);
     };
+
+    std::ostream &operator<< (std::ostream &out, const std::vector<Vertex> &v);
+    std::ostream &operator<< (std::ostream &out, const Vertex &v);
+    std::ostream &operator<< (std::ostream &out, const glm::vec4 &v);
+    std::ostream &operator<< (std::ostream &out, const glm::vec3 &v);
+    std::ostream &operator<< (std::ostream &out, const glm::vec2 &v);
 
 }
 
