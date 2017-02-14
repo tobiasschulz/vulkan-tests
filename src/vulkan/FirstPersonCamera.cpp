@@ -23,8 +23,8 @@ namespace vulkan
         return ubo;
     }
 
-    float yaw;
-    float pitch;
+    float yaw = 3.8;
+    float pitch  = -0.6;
     bool mouseSet = false;
 
     void FirstPersonCamera::handleMouseMove (vulkan::Renderer *renderer, int x, int y)
@@ -45,7 +45,7 @@ namespace vulkan
             pitch += -yoffset;
 
             cameraDirection = glm::vec3 (cos (pitch) * sin (yaw), sin (pitch), cos (pitch) * cos (yaw));
-            std::cout << "cameraDirection: " << cameraDirection << std::endl;
+            std::cout << "cameraDirection: " << cameraDirection << ", yaw: " << yaw << ", pitch: " << pitch << std::endl;
 
             mouseSet = true;
             glfwSetCursorPos (renderer->getWindow ()->getNativeWindow (), centerX, centerY);
