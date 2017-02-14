@@ -4,6 +4,7 @@
 
 #include "Vertex.h"
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 
 namespace helper

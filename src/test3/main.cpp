@@ -13,6 +13,7 @@
 #include <vector>
 #include <cstring>
 #include <set>
+#include <random>   
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
