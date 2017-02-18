@@ -63,7 +63,7 @@ private:
     {
         window->create (WIDTH, HEIGHT);
 
-        glfwSetInputMode(window->getNativeWindow (), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode (window->getNativeWindow (), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         glfwSetWindowUserPointer (window->getNativeWindow (), this);
         glfwSetKeyCallback (window->getNativeWindow (), [] (GLFWwindow *w, int key, int scancode, int action, int mods) {
@@ -73,7 +73,7 @@ private:
         });
         glfwSetCursorPosCallback (window->getNativeWindow (), [] (GLFWwindow *w, double x, double y) {
             auto that = static_cast<HelloTriangleApplication *>(glfwGetWindowUserPointer (w));
-            that->camera.handleMouseMove (that, (int)x, (int)y);
+            that->camera.handleMouseMove (that, (int) x, (int) y);
         });
     }
 
@@ -102,18 +102,45 @@ private:
 
     void mainLoop ()
     {
+        double lastTime = glfwGetTime ();
+        int nbFrames = 0;
+
         while (!glfwWindowShouldClose (window->getNativeWindow ())) {
             glfwPollEvents ();
 
+            // fps
+            double currentTime = glfwGetTime ();
+            nbFrames++;
+            if (currentTime - lastTime >= 1.0) {
+                std::cout << 1000.0 / (double) (nbFrames) << " ms/frame, " << nbFrames << " fps" << std::endl;
+                nbFrames = 0;
+                lastTime += 1.0;
+            }
+
+            double a = glfwGetTime ();
+
             camera.update (this);
+            double b = glfwGetTime ();
             uniformBuffer.update (camera.getUniformBufferObject ());
+            double c = glfwGetTime ();
             for (uint32_t m = 0; m < meshes.size (); m++) {
                 auto &mesh = meshes[m];
                 mesh->update (&camera);
             }
+            double d = glfwGetTime ();
             createCommandBuffers ();
 
+            double e = glfwGetTime ();
+
             drawFrame ();
+            double f = glfwGetTime ();
+            std::cout
+                    << "b-a = " << (b-a)
+                    << " ; c-b = " << (c-b)
+                   << " ; d-c = " << (d-c)
+                    << " ; e-d = " << (e-d)
+                    << " ; f-e = " << (f-e)
+                    << std::endl;
         }
 
         surface->getDevice ().waitIdle ();
@@ -316,8 +343,8 @@ private:
         std::mt19937 rng (rd ());
         std::uniform_int_distribution<int> uni (0, 1000000);
 
-        const size_t block_width = 20;
-        const size_t block_depth = 20;
+        const size_t block_width = 100;
+        const size_t block_depth = 100;
         const size_t block_height = 5;
         bool blocks[block_width][block_depth][block_height] = {};
         for (size_t x = 0; x < block_width; x++) {
@@ -340,6 +367,7 @@ private:
 
         std::shared_ptr<vulkan::Mesh> meshBlocks = std::make_shared<vulkan::Mesh> (this);
 
+        size_t g = 0;
         for (size_t x = 0; x < block_width; x++) {
             for (size_t z = 0; z < block_depth; z++) {
                 for (size_t y = 0; y < block_height; y++) {
@@ -361,6 +389,7 @@ private:
                     meshBlocks->addRectangle (min + helper::Vertex ({ 0.0f, width, 0.0f }, {}, {}), max);
                     meshBlocks->addRectangle (min + helper::Vertex ({ width, 0.0f, 0.0f }, {}, {}), max);
                     meshBlocks->addRectangle (min + helper::Vertex ({ 0.0f, 0.0f, width }, {}, {}), max);
+                    g++;
                 }
             }
         }
@@ -368,7 +397,8 @@ private:
         meshBlocks->create ();
         meshes.push_back (meshBlocks);
 
-
+        std::cout << "vertex count: " << meshBlocks->getVertexCount () << std::endl;
+        std::cout << "block count: " << g << std::endl;
     }
 
     void createUniformBuffer ()

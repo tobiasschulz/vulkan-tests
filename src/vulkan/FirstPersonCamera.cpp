@@ -45,7 +45,7 @@ namespace vulkan
             pitch += -yoffset;
 
             cameraDirection = glm::vec3 (cos (pitch) * sin (yaw), sin (pitch), cos (pitch) * cos (yaw));
-            std::cout << "cameraDirection: " << cameraDirection << ", yaw: " << yaw << ", pitch: " << pitch << std::endl;
+            //std::cout << "cameraDirection: " << cameraDirection << ", yaw: " << yaw << ", pitch: " << pitch << std::endl;
 
             mouseSet = true;
             glfwSetCursorPos (renderer->getWindow ()->getNativeWindow (), centerX, centerY);

@@ -61,6 +61,7 @@ namespace vulkan
 
     void Mesh::update (std::vector<helper::Vertex> *_vertices, std::vector<uint16_t> *_indices)
     {
+        return;
         // update vertex buffer
         vertexBuffer.update (
                 sizeof (helper::Vertex) * _vertices->size (), // buffer size
@@ -154,7 +155,7 @@ namespace vulkan
                     {{ max.pos.x, min.pos.y, max.pos.z }, { max.color.x, min.color.y, max.color.z }, { max.texCoord.x, max.texCoord.y }},
                     {{ min.pos.x, min.pos.y, max.pos.z }, { min.color.x, min.color.y, max.color.z }, { min.texCoord.x, max.texCoord.y }},
             };
-            std::cout << verticesNewY << std::endl;
+            //std::cout << verticesNewY << std::endl;
             add (verticesNewY, indicesNew);
         }
         else if (min.pos.x == max.pos.x) {
